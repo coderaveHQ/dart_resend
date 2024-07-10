@@ -120,7 +120,10 @@ class ResendEmailClient {
 
     // Send GET request to the API
     final http.Response response = await http.get(uri,
-        headers: <String, String>{'Authorization': 'Bearer $_apiKey'});
+        headers: <String, String>{
+          'Authorization': 'Bearer $_apiKey',
+          'Content-Type': 'application/json'
+        });
 
     // Decode the response
     final Json body = json.decode(response.body);
@@ -150,7 +153,10 @@ class ResendEmailClient {
 
     // Send GET request to the API
     final http.Response response = await http.post(uri,
-        headers: <String, String>{'Authorization': 'Bearer $_apiKey'},
+        headers: <String, String>{
+          'Authorization': 'Bearer $_apiKey',
+          'Content-Type': 'application/json'
+        },
         body: jsonEncode(paramsList.map((p) => p.toJson()).toList()));
 
     // Decode the response

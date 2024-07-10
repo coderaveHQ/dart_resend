@@ -42,7 +42,10 @@ class ResendApiKeysClient {
 
     // Send GET request to the API
     final http.Response response = await http.post(uri,
-        headers: <String, String>{'Authorization': 'Bearer $_apiKey'},
+        headers: <String, String>{
+          'Authorization': 'Bearer $_apiKey',
+          'Content-Type': 'application/json'
+        },
         body: jsonEncode(<String, dynamic>{
           'name': name,
           if (permission != null) 'permission': permission.id,
@@ -73,7 +76,10 @@ class ResendApiKeysClient {
 
     // Send GET request to the API
     final http.Response response = await http.get(uri,
-        headers: <String, String>{'Authorization': 'Bearer $_apiKey'});
+        headers: <String, String>{
+          'Authorization': 'Bearer $_apiKey',
+          'Content-Type': 'application/json'
+        });
 
     // Decode the response
     final Json body = json.decode(response.body);
@@ -105,7 +111,10 @@ class ResendApiKeysClient {
 
     // Send GET request to the API
     final http.Response response = await http.delete(uri,
-        headers: <String, String>{'Authorization': 'Bearer $_apiKey'});
+        headers: <String, String>{
+          'Authorization': 'Bearer $_apiKey',
+          'Content-Type': 'application/json'
+        });
 
     // Decode the response
     final Json body = json.decode(response.body);

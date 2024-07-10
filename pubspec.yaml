@@ -1,6 +1,6 @@
 name: dart_resend
 description: 'A Dart package for the Mapbox Search Box and Geocoding APIs.'
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/coderaveHQ/dart_resend
 
 homepage: https://github.com/coderaveHQ/dart_resend
