@@ -1,21 +1,34 @@
+import 'dart:io';
+
 import 'package:dart_resend/dart_resend.dart';
-import 'package:dart_resend/src/enums/resend_error.dart';
 
-late final ResendClient resend;
+/// Sends one test email using the API key in `RESEND_API_KEY`.
+Future<void> main() async {
+  final String? apiKey = Platform.environment['RESEND_API_KEY'];
+  if (apiKey == null || apiKey.isEmpty) {
+    stderr.writeln('Set RESEND_API_KEY before running this example.');
+    exitCode = 64;
+    return;
+  }
 
-void main() async {
-  final Resend result = Resend.initialize(apiKey: '...');
-  resend = result.client;
-
-  final ResendResult<ResendSendEmailResponse> response = await resend.email
-      .sendEmail(
-          from: 'scial Developer <dev@scial.app>',
-          to: <String>['fleeser@scial.app', 'sroepges@scial.app'],
-          subject: 'Check out this package',
-          text: 'WOW! This package is awesome!');
-
-  response.fold(
-      onSuccess: (ResendSendEmailResponse data) => print('E-Mail sent!'),
-      onFailure: (ResendError? error, String? message) =>
-          print('Error occured.'));
+  final Resend resend = Resend(apiKey: apiKey);
+  try {
+    final ResendResponse<ResendId> response = await resend.emails.send(
+      SendEmailRequest.raw(
+        from: 'Acme <onboarding@resend.dev>',
+        to: <String>['delivered@resend.dev'],
+        subject: 'Hello from dart_resend',
+        html: '<strong>It works!</strong>',
+        text: 'It works!',
+      ),
+    );
+    stdout.writeln('Queued email ${response.data.id}.');
+  } on ResendApiException catch (error) {
+    stderr.writeln(
+      'Resend rejected the request: ${error.message} '
+      '(request ${error.requestId ?? 'unknown'}).',
+    );
+  } finally {
+    resend.close();
+  }
 }

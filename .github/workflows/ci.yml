@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Dart ${{ matrix.sdk }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - '3.8.0'
+          - stable
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1.7.2
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze package
+        run: dart analyze --fatal-infos
+
+      - name: Run tests with coverage
+        run: dart test --coverage=coverage
+
+      - name: Convert coverage report
+        run: >-
+          dart run coverage:format_coverage
+          --packages=.dart_tool/package_config.json
+          --report-on=lib
+          --in=coverage
+          --out=coverage/lcov.info
+          --lcov
+
+      - name: Require 100% line coverage
+        run: dart run tool/check_coverage.dart
+
+      - name: Validate package publication
+        if: matrix.sdk == 'stable'
+        run: dart pub publish --dry-run
