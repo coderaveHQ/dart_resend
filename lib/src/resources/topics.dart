@@ -14,6 +14,7 @@ enum TopicSubscription implements ResendWireValue {
 
   const TopicSubscription(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -28,6 +29,7 @@ enum TopicVisibility implements ResendWireValue {
 
   const TopicVisibility(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -55,6 +57,7 @@ final class CreateTopicRequest implements ResendRequest {
   /// Visibility on the unsubscribe page. Resend defaults this to private.
   final TopicVisibility? visibility;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -84,6 +87,7 @@ final class UpdateTopicRequest implements ResendRequest {
   /// Replacement visibility on the unsubscribe page.
   final TopicVisibility? visibility;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -124,6 +128,7 @@ final class TopicsResource {
   /// Creates a topics resource client.
   TopicsResource(this._transport);
 
+  /// Transport used to execute topic endpoint requests.
   final ResendTransport _transport;
 
   /// Creates a topic.
@@ -176,6 +181,7 @@ final class TopicsResource {
   }
 }
 
+/// Validates a topic name against the API's length limit.
 String _validatedName(String value) {
   final String name = requireNonBlank(value, 'name');
   if (name.length > 50) {
@@ -184,6 +190,7 @@ String _validatedName(String value) {
   return name;
 }
 
+/// Validates an optional topic description against its length limit.
 String? _validatedDescription(String? value) {
   if (value != null && value.length > 200) {
     throw ArgumentError.value(

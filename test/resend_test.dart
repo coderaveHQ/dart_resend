@@ -5,7 +5,10 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: authenticated client exposes every resource and request
+  // metadata.
   test(
     'authenticated client exposes every resource and request metadata',
     () async {
@@ -62,6 +65,7 @@ void main() {
     },
   );
 
+  // Verifies: unauthenticated client supports public OAuth operations.
   test('unauthenticated client supports public OAuth operations', () async {
     final MockClient httpClient = MockClient((http.Request request) async {
       expect(request.headers, isNot(contains('authorization')));
@@ -102,6 +106,7 @@ void main() {
     resend.close();
   });
 
+  // Verifies: authenticated client uses the production authorization origin.
   test('authenticated client uses the production authorization origin', () {
     final Resend resend = Resend(apiKey: 're_test');
 
@@ -116,6 +121,7 @@ void main() {
     resend.close();
   });
 
+  // Verifies: unauthenticated client uses the production authorization origin.
   test('unauthenticated client uses the production authorization origin', () {
     final Resend resend = Resend.unauthenticated();
 

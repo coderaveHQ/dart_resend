@@ -1,8 +1,11 @@
 import 'package:dart_resend/src/core/json.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: immutableJsonMap.
   group('immutableJsonMap', () {
+    // Verifies: deeply copies and freezes every JSON value type.
     test('deeply copies and freezes every JSON value type', () {
       final List<Object?> sourceList = <Object?>[
         null,
@@ -29,6 +32,7 @@ void main() {
       );
     });
 
+    // Verifies: rejects values that JSON cannot represent.
     test('rejects values that JSON cannot represent', () {
       expect(
         () => immutableJsonMap(<String, Object?>{'value': double.nan}),
@@ -47,6 +51,7 @@ void main() {
     });
   });
 
+  // Covers: JsonMapReader.
   group('JsonMapReader', () {
     final JsonMap values = <String, Object?>{
       'string': 'value',
@@ -64,6 +69,7 @@ void main() {
       'date': '2026-07-20T12:30:00Z',
     };
 
+    // Verifies: reads required scalar values.
     test('reads required scalar values', () {
       expect(values.requiredString('string'), 'value');
       expect(values.requiredInt('int'), 2);
@@ -71,6 +77,7 @@ void main() {
       expect(values.requiredBool('bool'), isTrue);
     });
 
+    // Verifies: reads optional scalar values and nulls.
     test('reads optional scalar values and nulls', () {
       expect(values.optionalString('string'), 'value');
       expect(values.optionalInt('int'), 2);
@@ -84,6 +91,7 @@ void main() {
       expect(empty.optionalBool('value'), isNull);
     });
 
+    // Verifies: reports missing, null, and incorrectly typed scalars.
     test('reports missing, null, and incorrectly typed scalars', () {
       expect(
         () => const <String, Object?>{}.requiredString('missing'),
@@ -103,6 +111,7 @@ void main() {
       );
     });
 
+    // Verifies: reads and freezes object values.
     test('reads and freezes object values', () {
       final JsonMap required = values.requiredMap('map');
       final JsonMap? optional = values.optionalMap('map');
@@ -131,6 +140,7 @@ void main() {
       );
     });
 
+    // Verifies: reads and freezes array values.
     test('reads and freezes array values', () {
       final List<Object?> required = values.requiredList('list');
       final List<Object?>? optional = values.optionalList('list');
@@ -152,6 +162,7 @@ void main() {
       );
     });
 
+    // Verifies: reads arrays of strings.
     test('reads arrays of strings', () {
       expect(values.requiredStringList('strings'), <String>['one', 'two']);
       expect(values.optionalStringList('strings'), <String>['one', 'two']);
@@ -164,6 +175,7 @@ void main() {
       );
     });
 
+    // Verifies: reads ISO-8601 timestamps.
     test('reads ISO-8601 timestamps', () {
       expect(
         values.requiredDateTime('date'),

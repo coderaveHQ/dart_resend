@@ -7,8 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: topic request models.
   group('topic request models', () {
+    // Verifies: serialize documented enum values.
     test('serialize documented enum values', () {
       expect(TopicSubscription.optIn.value, 'opt_in');
       expect(TopicSubscription.optOut.value, 'opt_out');
@@ -16,6 +19,7 @@ void main() {
       expect(TopicVisibility.private.value, 'private');
     });
 
+    // Verifies: create request validates and omits absent optional fields.
     test('create request validates and omits absent optional fields', () {
       final CreateTopicRequest full = CreateTopicRequest(
         name: 'Product updates',
@@ -76,6 +80,7 @@ void main() {
       );
     });
 
+    // Verifies: update request requires and validates a change.
     test('update request requires and validates a change', () {
       final UpdateTopicRequest full = UpdateTopicRequest(
         name: 'Announcements',
@@ -106,6 +111,8 @@ void main() {
     });
   });
 
+  // Verifies: Topic exposes typed fields and preserves unknown response
+  // values.
   test('Topic exposes typed fields and preserves unknown response values', () {
     final Topic topic = Topic.fromJson(<String, Object?>{
       'id': 'topic_1',
@@ -139,6 +146,7 @@ void main() {
     expect(minimal.object, isNull);
   });
 
+  // Verifies: TopicsResource sends every documented operation.
   test('TopicsResource sends every documented operation', () async {
     final List<http.Request> requests = <http.Request>[];
     final MockClient client = MockClient((http.Request request) async {
@@ -238,6 +246,7 @@ void main() {
   });
 }
 
+/// Builds a complete topic response fixture for [id].
 Map<String, Object?> _topicJson(String id) => <String, Object?>{
   'id': id,
   'name': 'Product updates',
@@ -248,6 +257,7 @@ Map<String, Object?> _topicJson(String id) => <String, Object?>{
   'object': 'topic',
 };
 
+/// Encodes [body] as the JSON response returned by a topic endpoint.
 http.Response _jsonResponse(Object body, [int statusCode = 200]) {
   return http.Response(
     jsonEncode(body),

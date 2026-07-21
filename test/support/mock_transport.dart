@@ -4,6 +4,7 @@ import 'package:dart_resend/src/core/transport.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
+/// Creates a deterministic transport backed by [handler] for resource tests.
 ResendTransport mockTransport(
   Future<http.Response> Function(http.Request request) handler, {
   String? apiKey = 're_test',
@@ -15,6 +16,7 @@ ResendTransport mockTransport(
   );
 }
 
+/// Encodes [body] as a JSON response with deterministic metadata.
 http.Response jsonResponse(
   Object? body, {
   int statusCode = 200,
@@ -27,6 +29,7 @@ http.Response jsonResponse(
   );
 }
 
+/// Decodes the JSON body captured from [request].
 Object? decodedBody(http.Request request) {
   return request.body.isEmpty ? null : jsonDecode(request.body);
 }

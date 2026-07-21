@@ -16,6 +16,7 @@ enum BatchValidationMode implements ResendWireValue {
 
   const BatchValidationMode(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -30,6 +31,7 @@ enum ReceivedEmailHtmlFormat implements ResendWireValue {
 
   const ReceivedEmailHtmlFormat(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -56,6 +58,7 @@ final class EmailTag implements ResendRequest {
   /// The tag value.
   final String value;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => <String, Object?>{'name': name, 'value': value};
 }
@@ -73,6 +76,7 @@ final class EmailTemplate implements ResendRequest {
   /// Values supplied to the template's variables.
   final Map<String, Object> variables;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => <String, Object?>{
     'id': id,
@@ -82,6 +86,7 @@ final class EmailTemplate implements ResendRequest {
 
 /// An attachment supplied while sending an email.
 final class EmailAttachment implements ResendRequest {
+  /// Creates an attachment from one validated content source.
   EmailAttachment._({
     this.content,
     this.path,
@@ -169,6 +174,7 @@ final class EmailAttachment implements ResendRequest {
   /// Content ID used by an inline `cid:` reference.
   final String? contentId;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'content': content,
@@ -179,7 +185,9 @@ final class EmailAttachment implements ResendRequest {
   });
 }
 
+/// Shared validated payload state for single and batch email requests.
 abstract base class _EmailRequest implements ResendRequest {
+  /// Validates common addressing, content, scheduling, and metadata fields.
   _EmailRequest({
     required this.from,
     required List<String> to,
@@ -220,6 +228,7 @@ abstract base class _EmailRequest implements ResendRequest {
   final List<EmailTag>? tags;
   final String? topicId;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'from': from,
@@ -245,6 +254,7 @@ abstract base class _EmailRequest implements ResendRequest {
 
 /// Parameters for sending one email.
 final class SendEmailRequest extends _EmailRequest {
+  /// Creates a single-send payload after factory-specific validation.
   SendEmailRequest._({
     required super.from,
     required super.to,
@@ -339,6 +349,7 @@ final class SendEmailRequest extends _EmailRequest {
 /// Batch items support tags. Attachments and scheduling remain unsupported by
 /// the Resend batch endpoint.
 final class BatchEmailRequest extends _EmailRequest {
+  /// Creates one batch item after factory-specific validation.
   BatchEmailRequest._({
     required super.from,
     required super.to,
@@ -424,6 +435,7 @@ final class UpdateEmailRequest implements ResendRequest {
   /// ISO-8601 timestamp or supported natural-language schedule expression.
   final String scheduledAt;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => <String, Object?>{'scheduled_at': scheduledAt};
 }
@@ -690,6 +702,7 @@ final class EmailsResource {
   /// Creates an emails resource client.
   EmailsResource(this._transport);
 
+  /// Transport used to execute email endpoint requests.
   final ResendTransport _transport;
 
   /// Sends one email.
@@ -839,6 +852,7 @@ final class EmailsResource {
     ]);
   }
 
+  /// Lists attachments for an email in the selected sent/received collection.
   Future<ResendResponse<ResendPage<RetrievedEmailAttachment>>> _listAttachments(
     List<String> path,
     PaginationOptions? pagination,
@@ -854,6 +868,7 @@ final class EmailsResource {
     );
   }
 
+  /// Retrieves an attachment from the selected sent/received collection.
   Future<ResendResponse<RetrievedEmailAttachment>> _retrieveAttachment(
     List<String> path,
   ) {
@@ -864,10 +879,13 @@ final class EmailsResource {
   }
 }
 
+/// Adapts nested raw JSON to the typed readers on [ResendModel].
 final class _JsonReader extends ResendModel {
+  /// Creates a reader over immutable nested [json].
   _JsonReader(super.json);
 }
 
+/// Validates one email-tag component against Resend's wire constraints.
 String _tagPart(String value, String name) {
   if (!_tagPattern.hasMatch(value)) {
     throw ArgumentError.value(
@@ -879,6 +897,7 @@ String _tagPart(String value, String name) {
   return value;
 }
 
+/// Validates and freezes JSON-compatible template substitutions.
 Map<String, Object> _templateVariables(Map<String, Object> values) {
   final Map<String, Object> result = <String, Object>{};
   for (final MapEntry<String, Object> entry in values.entries) {
@@ -918,12 +937,14 @@ Map<String, Object> _templateVariables(Map<String, Object> values) {
   return Map<String, Object>.unmodifiable(result);
 }
 
+/// Requires at least one raw HTML or plain-text body representation.
 void _requireContent(String? html, String? text) {
   if (html == null && text == null) {
     throw ArgumentError('At least one of html or text must be provided.');
   }
 }
 
+/// Validates, copies, and freezes a required recipient list.
 List<String> _recipients(List<String> values, String name, {int? maximum}) {
   if (values.isEmpty || (maximum != null && values.length > maximum)) {
     throw RangeError.range(values.length, 1, maximum, name);
@@ -933,14 +954,17 @@ List<String> _recipients(List<String> values, String name, {int? maximum}) {
   );
 }
 
+/// Validates an optional recipient list while preserving omission.
 List<String>? _optionalRecipients(List<String>? values, String name) {
   return values == null ? null : _recipients(values, name);
 }
 
+/// Validates [value] when present while preserving null omission semantics.
 String? _optionalNonBlank(String? value, String name) {
   return value == null ? null : requireNonBlank(value, name);
 }
 
+/// Validates and freezes caller-provided email headers.
 Map<String, String>? _headers(Map<String, String>? values) {
   if (values == null) return null;
   if (values.isEmpty) {
@@ -952,14 +976,18 @@ Map<String, String>? _headers(Map<String, String>? values) {
   });
 }
 
+/// Validates and freezes an optional non-empty list.
 List<T>? _nonEmptyCopy<T>(List<T>? values, String name) {
   if (values == null) return null;
   return requireNonEmpty<T>(values, name);
 }
 
+/// Validates attachment count and combined encoded payload size.
 List<EmailAttachment>? _attachments(List<EmailAttachment>? values) {
   final List<EmailAttachment>? result = _nonEmptyCopy(values, 'attachments');
   if (result == null) return null;
+  // Resend's 40 MB limit applies to encoded inline content; remote
+  // attachments without content therefore do not contribute to this sum.
   final int encodedBytes = result.fold<int>(
     0,
     (int total, EmailAttachment value) => total + (value.content?.length ?? 0),
@@ -974,6 +1002,7 @@ List<EmailAttachment>? _attachments(List<EmailAttachment>? values) {
   return result;
 }
 
+/// Validates an optional idempotency key against the API length limit.
 String? _idempotencyKey(String? value) {
   if (value == null) return null;
   if (value.isEmpty || value.length > 256) {
@@ -982,6 +1011,7 @@ String? _idempotencyKey(String? value) {
   return value;
 }
 
+/// Decodes and freezes a required array of response models.
 List<T> _models<T>(
   ResendModel reader,
   String key,
@@ -997,6 +1027,7 @@ List<T> _models<T>(
   );
 }
 
+/// Decodes an optional model array while preserving an absent field.
 List<T>? _optionalModels<T>(
   ResendModel reader,
   String key,
@@ -1005,7 +1036,14 @@ List<T>? _optionalModels<T>(
   return reader.json[key] == null ? null : _models<T>(reader, key, decode);
 }
 
+/// Wire-safe character and length constraint for email tag components.
 final RegExp _tagPattern = RegExp(r'^[A-Za-z0-9_-]{1,256}$');
+
+/// Wire-safe identifier constraint for template variable names.
 final RegExp _templateVariablePattern = RegExp(r'^[A-Za-z0-9_]{1,50}$');
+
+/// Largest integer exactly representable by JavaScript JSON consumers.
 const num _maximumSafeInteger = 9007199254740991;
+
+/// Maximum combined Base64 payload accepted by Resend for attachments.
 const int _maximumEncodedAttachmentBytes = 40 * 1024 * 1024;

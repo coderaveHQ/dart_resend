@@ -72,6 +72,7 @@ final class Resend {
          authorizationBaseUri ?? baseUri ?? Uri.parse('https://api.resend.com'),
        );
 
+  /// Wires one transport into all resource clients exposed by this facade.
   Resend._(ResendTransport transport, Uri authorizationBaseUri)
     : _transport = transport,
       emails = EmailsResource(transport),
@@ -90,6 +91,7 @@ final class Resend {
       suppressions = SuppressionsResource(transport),
       oauth = OAuthResource(transport, baseUrl: authorizationBaseUri);
 
+  /// Shared transport owned by this facade and used by every resource client.
   final ResendTransport _transport;
 
   /// Sending, scheduling, batch, received-email, and attachment operations.

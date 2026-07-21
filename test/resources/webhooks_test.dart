@@ -5,7 +5,9 @@ import 'package:test/test.dart';
 
 import '../support/mock_transport.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: webhook requests serialize all documented events and statuses.
   test('webhook requests serialize all documented events and statuses', () {
     final List<String> values = WebhookEventType.values
         .map((WebhookEventType event) => event.value)
@@ -52,6 +54,7 @@ void main() {
     });
   });
 
+  // Verifies: webhook request validation rejects unusable configurations.
   test('webhook request validation rejects unusable configurations', () {
     expect(
       () => CreateWebhookRequest(
@@ -81,6 +84,7 @@ void main() {
     );
   });
 
+  // Verifies: webhook resource covers CRUD and paginated listing.
   test('webhook resource covers CRUD and paginated listing', () async {
     var call = 0;
     final WebhooksResource resource = WebhooksResource(

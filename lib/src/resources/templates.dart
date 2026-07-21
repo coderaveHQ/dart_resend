@@ -23,6 +23,7 @@ enum TemplateVariableType implements ResendWireValue {
 
   const TemplateVariableType(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -71,6 +72,7 @@ final class TemplateVariableInput implements ResendRequest {
   /// Value used when a send request omits this variable.
   final Object? fallbackValue;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'key': key,
@@ -123,6 +125,7 @@ final class CreateTemplateRequest implements ResendRequest {
   /// Declared template variables.
   final List<TemplateVariableInput> variables;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -191,6 +194,7 @@ final class UpdateTemplateRequest implements ResendRequest {
   /// Updated variable declarations.
   final List<TemplateVariableInput>? variables;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -272,6 +276,7 @@ final class TemplatesResource {
   /// Creates a templates resource client.
   TemplatesResource(this._transport);
 
+  /// Transport used to execute template endpoint requests.
   final ResendTransport _transport;
 
   /// Creates a template draft.
@@ -357,6 +362,7 @@ final class TemplatesResource {
   }
 }
 
+/// Enforces that a template fallback matches its declared variable [type].
 void _validateFallback(TemplateVariableType type, Object? value) {
   if (value == null) return;
   final bool valid = switch (type) {
@@ -371,6 +377,7 @@ void _validateFallback(TemplateVariableType type, Object? value) {
   }
 }
 
+/// Validates, copies, and freezes template variable definitions.
 List<TemplateVariableInput> _validatedVariables(
   List<TemplateVariableInput> variables,
 ) {
@@ -380,6 +387,7 @@ List<TemplateVariableInput> _validatedVariables(
   return List<TemplateVariableInput>.unmodifiable(variables);
 }
 
+/// Validates and freezes one JSON object decoded within [name].
 JsonObject _jsonObject(Object? value, String name) {
   if (value is Map<String, Object?>) return value;
   throw FormatException('Expected every $name item to be a JSON object.');

@@ -58,10 +58,19 @@ final class ResendTransport {
     }
   }
 
+  /// Bearer credential added only to authenticated requests.
   final String? _apiKey;
+
+  /// HTTP client that streams each constructed request.
   final http.Client _client;
+
+  /// Whether [close] must also release [_client].
   final bool _ownsClient;
+
+  /// Caller-provided headers merged before per-request headers.
   final Map<String, String> _defaultHeaders;
+
+  /// Prevents request dispatch after this transport has been closed.
   bool _closed = false;
 
   /// Base URI against which endpoint paths are resolved.
@@ -210,6 +219,8 @@ final class ResendTransport {
       throw StateError('An API key is required for authenticated requests.');
     }
 
+    // Encode each path component independently to prevent identifier slashes
+    // from changing the endpoint hierarchy.
     final Uri uri = _buildUri(pathSegments, query);
     final http.Request request = http.Request(normalizedMethod, uri);
     request.headers.addAll(
@@ -230,6 +241,8 @@ final class ResendTransport {
       request.bodyFields = form;
     }
 
+    // Centralize response/error decoding so every HTTP verb has identical
+    // timeout, exception, and metadata behavior.
     return _execute<T>(request, decode);
   }
 
@@ -292,6 +305,7 @@ final class ResendTransport {
     return _execute<T>(request, decode);
   }
 
+  /// Executes one request and normalizes network, API, and decode failures.
   Future<ResendResponse<T>> _execute<T>(
     http.BaseRequest request,
     T Function(JsonMap) decode,
@@ -327,6 +341,8 @@ final class ResendTransport {
       );
     }
 
+    // Decode malformed response bytes lossily so diagnostics retain a readable
+    // body even when an upstream proxy returns invalid UTF-8.
     final String responseBody = utf8.decode(
       response.bodyBytes,
       allowMalformed: true,
@@ -369,11 +385,13 @@ final class ResendTransport {
     }
   }
 
+  /// Sends [request] and buffers its streamed response for JSON decoding.
   Future<http.Response> _send(http.BaseRequest request) async {
     final http.StreamedResponse streamedResponse = await _client.send(request);
     return http.Response.fromStream(streamedResponse);
   }
 
+  /// Resolves encoded [pathSegments] and [query] against [baseUri].
   Uri _buildUri(List<String> pathSegments, Map<String, String>? query) {
     final List<String> baseSegments = baseUri.pathSegments
         .where((String segment) => segment.isNotEmpty)
@@ -384,6 +402,7 @@ final class ResendTransport {
     );
   }
 
+  /// Merges defaults and request headers, then enforces protected headers.
   Map<String, String> _buildHeaders({
     required String? contentType,
     required Map<String, String>? headers,
@@ -399,6 +418,8 @@ final class ResendTransport {
     if (headers != null) {
       _mergeHeaders(result, headers);
     }
+    // Protected headers are written after caller headers so authentication and
+    // entity encoding cannot be overridden with a differently cased key.
     if (authenticated) {
       _setHeader(result, 'Authorization', 'Bearer ${_apiKey!}');
     }
@@ -411,12 +432,14 @@ final class ResendTransport {
     return result;
   }
 
+  /// Case-insensitively merges [source] into [target].
   void _mergeHeaders(Map<String, String> target, Map<String, String> source) {
     for (final MapEntry<String, String> entry in source.entries) {
       _setHeader(target, entry.key, entry.value);
     }
   }
 
+  /// Replaces any case variant of [name] before assigning [value].
   void _setHeader(Map<String, String> target, String name, String value) {
     target.removeWhere(
       (String existing, String _) =>
@@ -425,6 +448,7 @@ final class ResendTransport {
     target[name] = value;
   }
 
+  /// Decodes a successful body as an object, treating an empty body as `{}`.
   JsonMap _decodeSuccessBody(http.Response response, String responseBody) {
     if (responseBody.trim().isEmpty) {
       return const <String, Object?>{};
@@ -446,6 +470,7 @@ final class ResendTransport {
     }
   }
 
+  /// Extracts structured API error fields while retaining the raw body.
   ResendApiException _apiException(
     http.Response response,
     String responseBody,
@@ -462,6 +487,8 @@ final class ResendTransport {
       }
     }
 
+    // Resend endpoints use both top-level errors and an `error` object; prefer
+    // the nested object while retaining the full payload in `details`.
     final JsonMap? nestedError = _nestedError(details);
     final JsonMap? error = nestedError ?? details;
     final String? errorName =
@@ -487,15 +514,18 @@ final class ResendTransport {
     );
   }
 
+  /// Returns a nested structured `error` object when one is present.
   JsonMap? _nestedError(JsonMap? details) {
     final Object? value = details?['error'];
     return value is Map<String, Object?> ? _toJsonMap(value) : null;
   }
 
+  /// Reads [key] only when its error-payload value is a string.
   String? _stringValue(JsonMap? map, String key) {
     final Object? value = map?[key];
     return value is String ? value : null;
   }
 
+  /// Freezes decoded JSON before exposing it through response models.
   JsonMap _toJsonMap(Map<String, Object?> value) => immutableJsonMap(value);
 }

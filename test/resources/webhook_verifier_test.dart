@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dart_resend/src/resources/webhook_verifier.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
   const String encodedSecret = 'c2VjcmV0LWtleQ==';
   const String secret = 'whsec_$encodedSecret';
@@ -17,6 +18,7 @@ void main() {
       '{"type":"email.delivered","created_at":"2026-07-20T12:00:00Z",'
       '"data":{"email_id":"email_1"}}';
 
+  // Verifies: verifies a signed webhook and exposes immutable event data.
   test('verifies a signed webhook and exposes immutable event data', () {
     final String signature = _signature(
       secret: encodedSecret,
@@ -38,6 +40,7 @@ void main() {
     expect(() => event.data['new'] = true, throwsUnsupportedError);
   });
 
+  // Verifies: accepts an unprefixed secret and rotated signatures.
   test('accepts an unprefixed secret and rotated signatures', () {
     final String signature = _signature(
       secret: encodedSecret,
@@ -59,6 +62,7 @@ void main() {
     );
   });
 
+  // Verifies: rejects invalid signatures and timestamps.
   test('rejects invalid signatures and timestamps', () {
     final ResendWebhookVerifier verifier = ResendWebhookVerifier(
       signingSecret: secret,
@@ -115,6 +119,7 @@ void main() {
     );
   });
 
+  // Verifies: rejects malformed signed JSON after authenticating it.
   test('rejects malformed signed JSON after authenticating it', () {
     for (final String invalidPayload in <String>['not-json', '[]']) {
       final String signature = _signature(
@@ -136,6 +141,7 @@ void main() {
     }
   });
 
+  // Verifies: validates verifier construction and exception formatting.
   test('validates verifier construction and exception formatting', () {
     expect(
       () => ResendWebhookVerifier(signingSecret: ' '),
@@ -159,6 +165,7 @@ void main() {
   });
 }
 
+/// Computes the Standard Webhooks signature expected by verifier tests.
 String _signature({
   required String secret,
   required String id,

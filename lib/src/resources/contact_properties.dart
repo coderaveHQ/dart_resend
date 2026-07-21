@@ -14,6 +14,7 @@ enum ContactPropertyType implements ResendWireValue {
 
   const ContactPropertyType(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -40,6 +41,7 @@ final class CreateContactPropertyRequest implements ResendRequest {
   /// The value returned when a contact has no explicit property value.
   final Object? fallbackValue;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'key': key,
@@ -59,6 +61,7 @@ final class UpdateContactPropertyRequest implements ResendRequest {
   /// The replacement fallback value, or `null` to clear it.
   final Object? fallbackValue;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => <String, Object?>{'fallback_value': fallbackValue};
 }
@@ -92,6 +95,7 @@ final class ContactPropertiesResource {
   /// Creates a contact-properties resource client.
   ContactPropertiesResource(this._transport);
 
+  /// Transport used to execute contact-property endpoint requests.
   final ResendTransport _transport;
 
   /// Creates a custom contact property.
@@ -146,6 +150,7 @@ final class ContactPropertiesResource {
   }
 }
 
+/// Validates the API's identifier syntax for a contact-property key.
 String _validatedKey(String value) {
   final String key = requireNonBlank(value, 'key');
   if (key.length > 50) {
@@ -161,6 +166,7 @@ String _validatedKey(String value) {
   return key;
 }
 
+/// Validates a create fallback against the property's declared [type].
 Object? _validatedFallback(Object? value, ContactPropertyType type) {
   if (value == null ||
       (type == ContactPropertyType.string && value is String) ||
@@ -174,6 +180,7 @@ Object? _validatedFallback(Object? value, ContactPropertyType type) {
   );
 }
 
+/// Validates an update fallback as null or a supported JSON scalar.
 Object? _validatedUpdateFallback(Object? value) {
   if (value == null || value is String || value is num) {
     return value;

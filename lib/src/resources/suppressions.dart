@@ -17,6 +17,7 @@ enum SuppressionOrigin implements ResendWireValue {
 
   const SuppressionOrigin(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -44,6 +45,7 @@ final class Suppression extends ResendModel {
 
 /// Selects suppressions to remove in a batch.
 final class RemoveSuppressionsRequest implements ResendRequest {
+  /// Creates a removal payload containing exactly one identifier kind.
   RemoveSuppressionsRequest._({this.emails, this.ids});
 
   /// Removes suppressions matching email addresses.
@@ -64,6 +66,7 @@ final class RemoveSuppressionsRequest implements ResendRequest {
   /// Suppression IDs selected for removal, when using [byIds].
   final List<String>? ids;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() =>
       compactJson(<String, Object?>{'emails': emails, 'ids': ids});
@@ -77,6 +80,7 @@ final class SuppressionsResource {
   /// Creates a suppressions resource client.
   SuppressionsResource(this._transport);
 
+  /// Transport used to execute suppression endpoint requests.
   final ResendTransport _transport;
 
   /// Adds [email] to the suppression list.
@@ -153,6 +157,7 @@ final class SuppressionsResource {
   }
 }
 
+/// Validates, copies, and freezes a bounded suppression batch.
 List<String> _validatedBatch(List<String> values, String name) {
   if (values.isEmpty || values.length > 100) {
     throw RangeError.range(values.length, 1, 100, name);

@@ -8,8 +8,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: contact request models.
   group('contact request models', () {
+    // Verifies: references serialize and validate IDs.
     test('references serialize and validate IDs', () {
       final ContactSegmentReference segment = ContactSegmentReference(
         'segment_1',
@@ -36,6 +39,8 @@ void main() {
       );
     });
 
+    // Verifies: create serializes all fields and defensively copies
+    // collections.
     test('create serializes all fields and defensively copies collections', () {
       final Map<String, Object?> sourceProperties = <String, Object?>{
         'tier': 'gold',
@@ -120,6 +125,7 @@ void main() {
       );
     });
 
+    // Verifies: create omits absent fields and rejects malformed values.
     test('create omits absent fields and rejects malformed values', () {
       final CreateContactRequest minimal = CreateContactRequest(
         email: 'minimal@example.com',
@@ -183,6 +189,7 @@ void main() {
       );
     });
 
+    // Verifies: update requires a field and serializes property changes.
     test('update requires a field and serializes property changes', () {
       final UpdateContactRequest full = UpdateContactRequest(
         firstName: 'New',
@@ -235,6 +242,7 @@ void main() {
       );
     });
 
+    // Verifies: topic update is non-empty, unique, and immutable.
     test('topic update is non-empty, unique, and immutable', () {
       final List<ContactTopicSubscription> source = <ContactTopicSubscription>[
         ContactTopicSubscription(
@@ -277,7 +285,9 @@ void main() {
     });
   });
 
+  // Covers: contact import request models.
   group('contact import request models', () {
+    // Verifies: serialize every documented enum value.
     test('serialize every documented enum value', () {
       expect(ContactImportOnConflict.upsert.value, 'upsert');
       expect(ContactImportOnConflict.skip.value, 'skip');
@@ -290,6 +300,8 @@ void main() {
       expect(ContactImportPropertyType.boolean.value, 'boolean');
     });
 
+    // Verifies: property mapping validates and conditionally includes its
+    // type.
     test('property mapping validates and conditionally includes its type', () {
       final ContactImportPropertyMapping typed = ContactImportPropertyMapping(
         column: 'Lifetime Value',
@@ -311,6 +323,7 @@ void main() {
       );
     });
 
+    // Verifies: column map serializes built-in and custom field mappings.
     test('column map serializes built-in and custom field mappings', () {
       final Map<String, ContactImportPropertyMapping> properties =
           <String, ContactImportPropertyMapping>{
@@ -364,6 +377,7 @@ void main() {
       );
     });
 
+    // Verifies: CSV import request validates and freezes upload inputs.
     test('CSV import request validates and freezes upload inputs', () {
       final List<int> bytes = utf8.encode('email\nperson@example.com\n');
       final List<ContactSegmentReference> segments = <ContactSegmentReference>[
@@ -438,7 +452,9 @@ void main() {
     });
   });
 
+  // Covers: contact response models.
   group('contact response models', () {
+    // Verifies: Contact exposes typed fields and immutable properties.
     test('Contact exposes typed fields and immutable properties', () {
       final Contact contact = Contact.fromJson(_contactJson('contact_1'));
       expect(contact.id, 'contact_1');
@@ -481,6 +497,7 @@ void main() {
       );
     });
 
+    // Verifies: membership and topic models expose typed fields.
     test('membership and topic models expose typed fields', () {
       final ContactSegment segment = ContactSegment.fromJson(
         _contactSegmentJson(),
@@ -538,6 +555,7 @@ void main() {
       expect(noDescription.description, isNull);
     });
 
+    // Verifies: import models expose raw status, optional dates, and counts.
     test('import models expose raw status, optional dates, and counts', () {
       final ContactImportCounts counts = ContactImportCounts.fromJson(
         <String, Object?>{
@@ -582,6 +600,8 @@ void main() {
     });
   });
 
+  // Verifies: ContactsResource sends contact, membership, and topic
+  // operations.
   test(
     'ContactsResource sends contact, membership, and topic operations',
     () async {
@@ -750,6 +770,8 @@ void main() {
     },
   );
 
+  // Verifies: ContactImportsResource sends multipart create, list, and
+  // retrieve.
   test(
     'ContactImportsResource sends multipart create, list, and retrieve',
     () async {
@@ -874,6 +896,7 @@ void main() {
   );
 }
 
+/// Builds a complete contact response fixture for [id].
 Map<String, Object?> _contactJson(String id) => <String, Object?>{
   'id': id,
   'email': 'person@example.com',
@@ -887,12 +910,14 @@ Map<String, Object?> _contactJson(String id) => <String, Object?>{
   'object': 'contact',
 };
 
+/// Builds a contact-segment membership response fixture.
 Map<String, Object?> _contactSegmentJson() => <String, Object?>{
   'id': 'segment_1',
   'name': 'VIP',
   'created_at': '2026-07-20T10:11:12.000Z',
 };
 
+/// Builds a contact-topic subscription response fixture.
 Map<String, Object?> _contactTopicJson() => <String, Object?>{
   'id': 'topic_1',
   'name': 'Product updates',
@@ -900,6 +925,7 @@ Map<String, Object?> _contactTopicJson() => <String, Object?>{
   'subscription': 'future_subscription',
 };
 
+/// Builds a contact-import response fixture for [id].
 Map<String, Object?> _contactImportJson(String id) => <String, Object?>{
   'id': id,
   'status': 'future_status',
@@ -915,6 +941,7 @@ Map<String, Object?> _contactImportJson(String id) => <String, Object?>{
   'object': 'contact_import',
 };
 
+/// Wraps [item] in a cursor-page response fixture.
 http.Response _pageResponse(Object item, {bool hasMore = false}) {
   return _jsonResponse(<String, Object?>{
     'object': 'list',
@@ -923,6 +950,7 @@ http.Response _pageResponse(Object item, {bool hasMore = false}) {
   });
 }
 
+/// Encodes [body] as the JSON response returned by a contact endpoint.
 http.Response _jsonResponse(Object body, [int statusCode = 200]) {
   return http.Response(
     jsonEncode(body),

@@ -28,6 +28,7 @@ final class ResendWebhookVerificationException implements Exception {
   /// Human-readable failure description.
   final String message;
 
+  /// Returns a diagnostic representation of this value.
   @override
   String toString() => 'ResendWebhookVerificationException: $message';
 }
@@ -50,6 +51,7 @@ final class ResendWebhookVerifier {
     }
   }
 
+  /// Decoded HMAC key material derived from the configured signing secret.
   final List<int> _key;
 
   /// Maximum accepted difference between local time and the signed timestamp.
@@ -76,6 +78,8 @@ final class ResendWebhookVerifier {
       );
     }
 
+    // Authenticate the timestamp before computing the HMAC to reject replayed
+    // payloads outside the configured acceptance window.
     final DateTime signedAt = DateTime.fromMillisecondsSinceEpoch(
       seconds * Duration.millisecondsPerSecond,
       isUtc: true,
@@ -87,6 +91,7 @@ final class ResendWebhookVerifier {
       );
     }
 
+    // Standard Webhooks signs the exact ID, timestamp, and raw payload bytes.
     final Digest expected = Hmac(
       sha256,
       _key,
@@ -111,6 +116,7 @@ final class ResendWebhookVerifier {
   }
 }
 
+/// Decodes a Standard Webhooks secret with or without its `whsec_` prefix.
 List<int> _decodeSecret(String secret) {
   final String value = requireNonBlank(secret, 'signingSecret');
   final String encoded = value.startsWith('whsec_')
@@ -127,6 +133,7 @@ List<int> _decodeSecret(String secret) {
   }
 }
 
+/// Checks every version-1 candidate to support signing-key rotation.
 bool _matchesAnySignature(String header, List<int> expected) {
   var matched = false;
   for (final String candidate in header.split(RegExp(r'\s+'))) {
@@ -144,6 +151,7 @@ bool _matchesAnySignature(String header, List<int> expected) {
   return matched;
 }
 
+/// Compares signature bytes without data-dependent early termination.
 bool _constantTimeEquals(List<int> left, List<int> right) {
   var difference = left.length ^ right.length;
   final int length = left.length < right.length ? left.length : right.length;

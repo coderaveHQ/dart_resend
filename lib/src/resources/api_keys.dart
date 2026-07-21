@@ -14,6 +14,7 @@ enum ApiKeyPermission implements ResendWireValue {
 
   const ApiKeyPermission(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -39,6 +40,7 @@ final class CreateApiKeyRequest implements ResendRequest {
   /// Optional domain restriction for a sending-only key.
   final String? domainId;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -82,6 +84,7 @@ final class ApiKeysResource {
   /// Creates an API-key resource client.
   ApiKeysResource(this._transport);
 
+  /// Transport used to execute API-key endpoint requests.
   final ResendTransport _transport;
 
   /// Creates an API key.

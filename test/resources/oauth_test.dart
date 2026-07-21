@@ -7,7 +7,9 @@ import 'package:test/test.dart';
 
 import '../support/mock_transport.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: PKCE generates and validates S256 verifier pairs.
   test('PKCE generates and validates S256 verifier pairs', () {
     const String verifier =
         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~';
@@ -30,6 +32,7 @@ void main() {
     );
   });
 
+  // Verifies: PKCE uses a secure random source by default.
   test('PKCE uses a secure random source by default', () {
     final OAuthPkcePair pair = OAuthPkcePair.generate();
 
@@ -37,6 +40,7 @@ void main() {
     expect(pair.challenge, isNotEmpty);
   });
 
+  // Verifies: OAuth registration validates and serializes public clients.
   test('OAuth registration validates and serializes public clients', () {
     final RegisterOAuthClientRequest request = RegisterOAuthClientRequest(
       clientName: 'Dart client',
@@ -72,6 +76,7 @@ void main() {
     );
   });
 
+  // Verifies: OAuth registration rejects invalid metadata.
   test('OAuth registration rejects invalid metadata', () {
     expect(
       () => RegisterOAuthClientRequest(
@@ -141,6 +146,7 @@ void main() {
     expect(() => emptyScopes.toJson(), throwsArgumentError);
   });
 
+  // Verifies: OAuth models expose registration, token, and grant data.
   test('OAuth models expose registration, token, and grant data', () {
     final RegisteredOAuthClient client = RegisteredOAuthClient.fromJson(
       _clientJson,
@@ -186,6 +192,7 @@ void main() {
     expect(revoked.revokedReason, 'user_revoked');
   });
 
+  // Verifies: OAuth resource covers registration, PKCE, tokens, and grants.
   test(
     'OAuth resource covers registration, PKCE, tokens, and grants',
     () async {
@@ -364,5 +371,6 @@ const Map<String, Object?> _revokedGrantJson = <String, Object?>{
   'revoked_reason': 'user_revoked',
 };
 
+/// Repeats [value] to construct PKCE verifier boundary fixtures.
 String _repeat(String value, int count) =>
     List<String>.filled(count, value).join();

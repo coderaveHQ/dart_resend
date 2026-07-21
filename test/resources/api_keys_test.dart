@@ -5,7 +5,9 @@ import 'package:test/test.dart';
 
 import '../support/mock_transport.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: API key request validates and serializes permissions.
   test('API key request validates and serializes permissions', () {
     final CreateApiKeyRequest request = CreateApiKeyRequest(
       name: 'Mailer',
@@ -33,6 +35,7 @@ void main() {
     );
   });
 
+  // Verifies: API key models expose response data.
   test('API key models expose response data', () {
     final CreatedApiKey created = CreatedApiKey.fromJson(<String, Object?>{
       'id': 'key_1',
@@ -62,6 +65,7 @@ void main() {
     );
   });
 
+  // Verifies: API key resource calls create, list, and delete endpoints.
   test('API key resource calls create, list, and delete endpoints', () async {
     var call = 0;
     final ApiKeysResource resource = ApiKeysResource(

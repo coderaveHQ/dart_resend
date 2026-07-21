@@ -16,6 +16,7 @@ final class ContactSegmentReference implements ResendRequest {
   /// The segment ID.
   final String id;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => <String, Object?>{'id': id};
 }
@@ -32,6 +33,7 @@ final class ContactTopicSubscription implements ResendRequest {
   /// The contact's subscription preference for the topic.
   final TopicSubscription subscription;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => <String, Object?>{
     'id': id,
@@ -80,6 +82,7 @@ final class CreateContactRequest implements ResendRequest {
   /// Initial topic subscriptions for the contact.
   final List<ContactTopicSubscription> topics;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'email': email,
@@ -147,6 +150,7 @@ final class UpdateContactRequest implements ResendRequest {
   /// Whether to clear the contact's last name.
   final bool clearLastName;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => Map<String, Object?>.unmodifiable(<String, Object?>{
     if (clearFirstName)
@@ -301,6 +305,7 @@ enum ContactImportOnConflict implements ResendWireValue {
 
   const ContactImportOnConflict(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -321,6 +326,7 @@ enum ContactImportStatus implements ResendWireValue {
 
   const ContactImportStatus(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -338,6 +344,7 @@ enum ContactImportPropertyType implements ResendWireValue {
 
   const ContactImportPropertyType(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -354,6 +361,7 @@ final class ContactImportPropertyMapping implements ResendRequest {
   /// How the CSV value is decoded. Resend defaults this when omitted.
   final ContactImportPropertyType? type;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() =>
       compactJson(<String, Object?>{'column': column, 'type': type?.value});
@@ -398,6 +406,7 @@ final class ContactImportColumnMap implements ResendRequest {
   /// Custom property keys and their CSV-column mappings.
   final Map<String, ContactImportPropertyMapping> properties;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'email': email,
@@ -446,6 +455,7 @@ final class CreateContactImportRequest {
   /// Topic subscriptions assigned to every imported contact.
   final List<ContactTopicSubscription> topics;
 
+  /// Encodes non-file import options as multipart form fields.
   Map<String, String> _toMultipartFields() => <String, String>{
     if (columnMap != null) 'column_map': jsonEncode(columnMap!.toJson()),
     if (onConflict != null) 'on_conflict': onConflict!.value,
@@ -515,6 +525,7 @@ final class ContactImportsResource {
   /// Creates a contact-import resource client.
   ContactImportsResource(this._transport);
 
+  /// Transport used to execute contact-import endpoint requests.
   final ResendTransport _transport;
 
   /// Starts an asynchronous CSV contact import.
@@ -560,6 +571,7 @@ final class ContactsResource {
     : _transport = transport,
       imports = ContactImportsResource(transport);
 
+  /// Transport shared by direct contacts and nested import operations.
   final ResendTransport _transport;
 
   /// Asynchronous CSV contact-import operations.
@@ -718,10 +730,12 @@ final class ContactsResource {
   }
 }
 
+/// Validates [value] when present while preserving null omission semantics.
 String? _optionalNonBlank(String? value, String name) {
   return value == null ? null : requireNonBlank(value, name);
 }
 
+/// Validates custom contact-property names and JSON-compatible values.
 JsonObject _validatedProperties(Map<String, Object?> values) {
   final JsonObject result = <String, Object?>{};
   for (final MapEntry<String, Object?> entry in values.entries) {
@@ -739,6 +753,7 @@ JsonObject _validatedProperties(Map<String, Object?> values) {
   return immutableJsonMap(result);
 }
 
+/// Validates, copies, and freezes contact segment references.
 List<ContactSegmentReference> _validatedSegments(
   List<ContactSegmentReference> values,
 ) {
@@ -751,6 +766,7 @@ List<ContactSegmentReference> _validatedSegments(
   return List<ContactSegmentReference>.unmodifiable(values);
 }
 
+/// Validates, copies, and freezes contact topic subscriptions.
 List<ContactTopicSubscription> _validatedTopics(
   List<ContactTopicSubscription> values,
 ) {
@@ -763,6 +779,7 @@ List<ContactTopicSubscription> _validatedTopics(
   return List<ContactTopicSubscription>.unmodifiable(values);
 }
 
+/// Validates, copies, and freezes CSV column-to-property mappings.
 Map<String, ContactImportPropertyMapping> _validatedPropertyMappings(
   Map<String, ContactImportPropertyMapping> values,
 ) {
@@ -775,6 +792,7 @@ Map<String, ContactImportPropertyMapping> _validatedPropertyMappings(
   return Map<String, ContactImportPropertyMapping>.unmodifiable(result);
 }
 
+/// Validates and freezes an import file within Resend's byte-size limit.
 List<int> _validatedFileBytes(List<int> bytes) {
   if (bytes.isEmpty) {
     throw ArgumentError.value(bytes, 'bytes', 'Must not be empty.');
@@ -787,6 +805,7 @@ List<int> _validatedFileBytes(List<int> bytes) {
   return List<int>.unmodifiable(bytes);
 }
 
+/// Validates and freezes one object nested in response [field].
 JsonObject _responseObject(Object? value, String field) {
   if (value is JsonObject) return value;
   throw FormatException(

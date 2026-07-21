@@ -5,7 +5,9 @@ import 'package:test/test.dart';
 
 import '../support/mock_transport.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: template variable inputs validate every documented type.
   test('template variable inputs validate every documented type', () {
     final List<TemplateVariableInput> variables = <TemplateVariableInput>[
       TemplateVariableInput(
@@ -75,6 +77,7 @@ void main() {
     );
   });
 
+  // Verifies: template create and update requests serialize every field.
   test('template create and update requests serialize every field', () {
     final TemplateVariableInput variable = TemplateVariableInput(
       key: 'NAME',
@@ -125,6 +128,7 @@ void main() {
     );
   });
 
+  // Verifies: template requests reject empty content and invalid update sets.
   test('template requests reject empty content and invalid update sets', () {
     expect(
       () => CreateTemplateRequest(name: ' ', html: '<p>Hi</p>'),
@@ -151,6 +155,7 @@ void main() {
     expect(() => UpdateTemplateRequest(), throwsArgumentError);
   });
 
+  // Verifies: template response exposes full and summary representations.
   test('template response exposes full and summary representations', () {
     final ResendTemplate template = ResendTemplate.fromJson(_templateJson);
     expect(template.id, 'tpl_1');
@@ -210,6 +215,7 @@ void main() {
     expect(minimalVariable.updatedAt, isNull);
   });
 
+  // Verifies: templates resource covers every endpoint.
   test('templates resource covers every endpoint', () async {
     var call = 0;
     final TemplatesResource resource = TemplatesResource(

@@ -15,6 +15,7 @@ enum AutomationStatus implements ResendWireValue {
 
   const AutomationStatus(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -35,6 +36,7 @@ enum AutomationRunStatus implements ResendWireValue {
 
   const AutomationRunStatus(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -76,12 +78,14 @@ enum AutomationConditionOperator implements ResendWireValue {
 
   const AutomationConditionOperator(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
 
 /// A condition rule or a logical group of condition rules.
 final class AutomationCondition implements ResendRequest {
+  /// Creates a condition from an already validated wire object.
   AutomationCondition._(JsonObject json) : _json = immutableJsonMap(json);
 
   /// Creates a single comparison rule.
@@ -136,6 +140,7 @@ final class AutomationCondition implements ResendRequest {
     return AutomationCondition._group('or', rules);
   }
 
+  /// Creates a validated logical [type] group from [rules].
   factory AutomationCondition._group(
     String type,
     List<AutomationCondition> rules,
@@ -149,11 +154,13 @@ final class AutomationCondition implements ResendRequest {
     });
   }
 
+  /// Immutable wire representation shared by rule and group conditions.
   final JsonObject _json;
 
   /// The wire condition type: `rule`, `and`, or `or`.
   String get type => _json['type']! as String;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => _json;
 }
@@ -178,6 +185,7 @@ final class AutomationConnection implements ResendRequest {
   /// Branch type, omitted for an ordinary default connection.
   final AutomationConnectionType? type;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'from': from,
@@ -205,12 +213,14 @@ enum AutomationConnectionType implements ResendWireValue {
 
   const AutomationConnectionType(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
 
 /// One node in an automation graph.
 final class AutomationStep implements ResendRequest {
+  /// Creates a step from a validated type-specific payload.
   AutomationStep._({
     required String key,
     required String type,
@@ -392,6 +402,7 @@ final class AutomationStep implements ResendRequest {
   /// Deeply immutable wire-format step configuration.
   final JsonObject config;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => immutableJsonMap(<String, Object?>{
     'key': key,
@@ -433,6 +444,7 @@ final class CreateAutomationRequest implements ResendRequest {
   /// Immutable graph connections.
   final List<AutomationConnection> connections;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -484,6 +496,7 @@ final class UpdateAutomationRequest implements ResendRequest {
   /// Replacement graph connections.
   final List<AutomationConnection>? connections;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -696,6 +709,7 @@ final class AutomationRunsResource {
   /// Creates an automation-runs resource client.
   AutomationRunsResource(this._transport);
 
+  /// Transport used to execute automation-run endpoint requests.
   final ResendTransport _transport;
 
   /// Lists runs belonging to [automationId].
@@ -749,6 +763,7 @@ final class AutomationsResource {
   AutomationsResource(this._transport)
     : runs = AutomationRunsResource(_transport);
 
+  /// Transport shared by graph operations and nested run operations.
   final ResendTransport _transport;
 
   /// Operations for executions of an automation.
@@ -817,13 +832,16 @@ final class AutomationsResource {
   }
 }
 
+/// Sentinel that distinguishes an omitted update from an explicit JSON null.
 const Object _omitted = Object();
 
+/// Whether [field] addresses event or contact data in a condition.
 bool _isConditionField(String field) {
   return (field.startsWith('event.') && field.length > 'event.'.length) ||
       (field.startsWith('contact.') && field.length > 'contact.'.length);
 }
 
+/// Enforces the operand type required by [operator].
 void _validateConditionValue(
   AutomationConditionOperator operator,
   Object? value,
@@ -856,6 +874,7 @@ void _validateConditionValue(
   immutableJsonMap(<String, Object?>{'value': value});
 }
 
+/// Validates a name operand as text, null, or an automation variable.
 void _validateNameValue(Object? value, String name) {
   if (value != null && value is! String && !_isVariable(value)) {
     throw ArgumentError.value(
@@ -866,6 +885,7 @@ void _validateNameValue(Object? value, String name) {
   }
 }
 
+/// Validates a property operand as a JSON scalar or automation variable.
 void _validatePropertyValue(Object? value, String name) {
   if (value != null &&
       value is! String &&
@@ -881,12 +901,14 @@ void _validatePropertyValue(Object? value, String name) {
   immutableJsonMap(<String, Object?>{'value': value});
 }
 
+/// Whether [value] is a single-key, non-empty `{"var": path}` reference.
 bool _isVariable(Object? value) {
   if (value is! Map<String, Object?> || value.length != 1) return false;
   final Object? path = value['var'];
   return path is String && path.trim().isNotEmpty;
 }
 
+/// Validates graph reachability and branch-specific connection types.
 void _validateGraph(
   List<AutomationStep> steps,
   List<AutomationConnection> connections,
@@ -894,6 +916,8 @@ void _validateGraph(
   final Set<String> keys = _validateSteps(steps);
   _validateConnections(connections, keys);
 
+  // Compute a fixed-point traversal from the trigger without assuming that
+  // the caller supplied steps or connections in topological order.
   final Set<String> reachable = <String>{steps.first.key};
   bool changed;
   do {
@@ -940,6 +964,7 @@ void _validateGraph(
   }
 }
 
+/// Validates trigger placement, size limits, and unique step keys.
 Set<String> _validateSteps(List<AutomationStep> steps) {
   if (steps.isEmpty) {
     throw ArgumentError.value(steps, 'steps', 'Must not be empty.');
@@ -963,6 +988,7 @@ Set<String> _validateSteps(List<AutomationStep> steps) {
   return keys;
 }
 
+/// Validates connection endpoints and rejects duplicate directed edges.
 void _validateConnections(
   List<AutomationConnection> connections,
   Set<String>? stepKeys,
@@ -982,10 +1008,12 @@ void _validateConnections(
   }
 }
 
+/// Validates [value] when present while preserving null omission semantics.
 String? _optionalNonBlank(String? value, String name) {
   return value == null ? null : requireNonBlank(value, name);
 }
 
+/// Validates and freezes one JSON object decoded within [name].
 JsonObject _jsonObject(Object? value, String name) {
   if (value is Map<String, Object?>) return immutableJsonMap(value);
   throw FormatException('Expected every $name item to be a JSON object.');

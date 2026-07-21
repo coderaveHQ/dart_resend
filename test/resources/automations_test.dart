@@ -8,8 +8,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: automation wire enums.
   group('automation wire enums', () {
+    // Verifies: serialize every documented value.
     test('serialize every documented value', () {
       expect(
         AutomationStatus.values.map((AutomationStatus value) => value.value),
@@ -54,7 +57,9 @@ void main() {
     });
   });
 
+  // Covers: AutomationCondition.
   group('AutomationCondition', () {
+    // Verifies: serializes every rule operator and logical group.
     test('serializes every rule operator and logical group', () {
       final List<AutomationCondition> rules = <AutomationCondition>[
         AutomationCondition.rule(
@@ -129,6 +134,7 @@ void main() {
       expect(() => all.toJson()['new'] = true, throwsUnsupportedError);
     });
 
+    // Verifies: validates fields, values, and groups.
     test('validates fields, values, and groups', () {
       expect(
         () => AutomationCondition.rule(
@@ -205,7 +211,9 @@ void main() {
     });
   });
 
+  // Covers: AutomationStep.
   group('AutomationStep', () {
+    // Verifies: serializes all documented step factories.
     test('serializes all documented step factories', () {
       final JsonObject variable = automationVariable('event.first_name');
       final AutomationCondition filter = AutomationCondition.rule(
@@ -310,6 +318,7 @@ void main() {
       );
     });
 
+    // Verifies: validates factory input and typed contact values.
     test('validates factory input and typed contact values', () {
       expect(() => automationVariable(' '), throwsArgumentError);
       expect(
@@ -419,7 +428,9 @@ void main() {
     });
   });
 
+  // Covers: automation graph requests.
   group('automation graph requests', () {
+    // Verifies: connection serializes optional and explicit types.
     test('connection serializes optional and explicit types', () {
       final AutomationConnection plain = AutomationConnection(
         from: 'one',
@@ -449,6 +460,7 @@ void main() {
       );
     });
 
+    // Verifies: create request validates and freezes a branching graph.
     test('create request validates and freezes a branching graph', () {
       final List<AutomationStep> steps = _branchingSteps();
       final List<AutomationConnection> connections = _branchingConnections();
@@ -498,6 +510,7 @@ void main() {
       });
     });
 
+    // Verifies: update request accepts each supported patch shape.
     test('update request accepts each supported patch shape', () {
       final UpdateAutomationRequest metadata = UpdateAutomationRequest(
         name: 'Renamed',
@@ -540,6 +553,7 @@ void main() {
       expect(() => UpdateAutomationRequest(name: ' '), throwsArgumentError);
     });
 
+    // Verifies: rejects invalid graph structures and branch types.
     test('rejects invalid graph structures and branch types', () {
       final AutomationStep trigger = AutomationStep.trigger(
         key: 'start',
@@ -721,7 +735,9 @@ void main() {
     });
   });
 
+  // Covers: automation response models.
   group('automation response models', () {
+    // Verifies: expose summaries and forward-compatible raw strings.
     test('expose summaries and forward-compatible raw strings', () {
       final Automation automation = Automation.fromJson(<String, Object?>{
         'id': 'automation-id',
@@ -746,6 +762,7 @@ void main() {
       expect(minimal.updatedAt, isNull);
     });
 
+    // Verifies: decodes complete automation graph details.
     test('decodes complete automation graph details', () {
       final AutomationDetails details = AutomationDetails.fromJson(
         _automationDetailsJson('automation-id'),
@@ -779,6 +796,7 @@ void main() {
       expect(() => malformed.steps, throwsFormatException);
     });
 
+    // Verifies: decodes stop and run diagnostics.
     test('decodes stop and run diagnostics', () {
       final StoppedAutomation stopped = StoppedAutomation.fromJson(
         <String, Object?>{
@@ -835,6 +853,7 @@ void main() {
     });
   });
 
+  // Verifies: AutomationsResource sends every endpoint with encoded paths.
   test('AutomationsResource sends every endpoint with encoded paths', () async {
     final List<http.Request> requests = <http.Request>[];
     final MockClient client = MockClient((http.Request request) async {
@@ -997,6 +1016,7 @@ void main() {
   });
 }
 
+/// Builds the canonical branching graph steps reused by automation tests.
 List<AutomationStep> _branchingSteps() => <AutomationStep>[
   AutomationStep.trigger(key: 'start', eventName: 'user.created'),
   AutomationStep.condition(
@@ -1017,6 +1037,7 @@ List<AutomationStep> _branchingSteps() => <AutomationStep>[
   AutomationStep.deleteContact(key: 'delete'),
 ];
 
+/// Builds valid branch connections for [_branchingSteps].
 List<AutomationConnection> _branchingConnections() => <AutomationConnection>[
   AutomationConnection(from: 'start', to: 'condition'),
   AutomationConnection(
@@ -1042,6 +1063,7 @@ List<AutomationConnection> _branchingConnections() => <AutomationConnection>[
   ),
 ];
 
+/// Builds an automation summary response fixture for [id].
 Map<String, Object?> _automationJson(String id) => <String, Object?>{
   'id': id,
   'name': 'Lifecycle',
@@ -1050,6 +1072,7 @@ Map<String, Object?> _automationJson(String id) => <String, Object?>{
   'updated_at': null,
 };
 
+/// Builds an automation detail fixture linked to [_branchingSteps].
 Map<String, Object?> _automationDetailsJson(String id) => <String, Object?>{
   ..._automationJson(id),
   'object': 'automation',
@@ -1065,6 +1088,7 @@ Map<String, Object?> _automationDetailsJson(String id) => <String, Object?>{
   ],
 };
 
+/// Builds an automation-run summary response fixture for [id].
 Map<String, Object?> _runSummaryJson(String id) => <String, Object?>{
   'id': id,
   'status': 'future_run_status',
@@ -1073,6 +1097,7 @@ Map<String, Object?> _runSummaryJson(String id) => <String, Object?>{
   'created_at': '2026-07-20T09:00:00Z',
 };
 
+/// Builds a detailed automation-run response fixture for [id].
 Map<String, Object?> _runJson(String id) => <String, Object?>{
   'object': 'automation_run',
   ..._runSummaryJson(id),
@@ -1090,6 +1115,7 @@ Map<String, Object?> _runJson(String id) => <String, Object?>{
   ],
 };
 
+/// Encodes [body] as the JSON response returned by an automation endpoint.
 http.Response _jsonResponse(Object body, [int statusCode = 200]) {
   return http.Response(
     jsonEncode(body),

@@ -7,8 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: event request models.
   group('event request models', () {
+    // Verifies: schema types serialize documented values.
     test('schema types serialize documented values', () {
       expect(
         EventSchemaType.values.map((EventSchemaType type) => type.value),
@@ -16,6 +19,7 @@ void main() {
       );
     });
 
+    // Verifies: create request validates and freezes an optional schema.
     test('create request validates and freezes an optional schema', () {
       final Map<String, EventSchemaType> schema = <String, EventSchemaType>{
         'name': EventSchemaType.string,
@@ -58,6 +62,7 @@ void main() {
       );
     });
 
+    // Verifies: update request replaces or clears schema.
     test('update request replaces or clears schema', () {
       final UpdateEventRequest replacement = UpdateEventRequest(
         schema: <String, EventSchemaType>{'score': EventSchemaType.number},
@@ -76,6 +81,7 @@ void main() {
       expect(clear.toJson(), <String, Object?>{'schema': null});
     });
 
+    // Verifies: send request requires exactly one contact selector.
     test('send request requires exactly one contact selector', () {
       final Map<String, Object?> payload = <String, Object?>{
         'plan': 'pro',
@@ -144,7 +150,9 @@ void main() {
     });
   });
 
+  // Covers: event response models.
   group('event response models', () {
+    // Verifies: exposes fields and preserves unknown schema strings.
     test('exposes fields and preserves unknown schema strings', () {
       final CustomEvent event = CustomEvent.fromJson(<String, Object?>{
         'id': 'event-id',
@@ -188,6 +196,7 @@ void main() {
       expect(() => malformed.schema, throwsFormatException);
     });
 
+    // Verifies: decodes sent event response.
     test('decodes sent event response', () {
       final SentEvent event = SentEvent.fromJson(<String, Object?>{
         'object': 'future_event_object',
@@ -198,6 +207,7 @@ void main() {
     });
   });
 
+  // Verifies: EventsResource sends every endpoint with encoded identifiers.
   test(
     'EventsResource sends every endpoint with encoded identifiers',
     () async {
@@ -321,6 +331,7 @@ void main() {
   );
 }
 
+/// Builds a complete custom-event response fixture for [id].
 Map<String, Object?> _eventJson(String id) => <String, Object?>{
   'object': 'event',
   'id': id,
@@ -330,6 +341,7 @@ Map<String, Object?> _eventJson(String id) => <String, Object?>{
   'updated_at': null,
 };
 
+/// Encodes [body] as the JSON response returned by an event endpoint.
 http.Response _jsonResponse(Object body, [int statusCode = 200]) {
   return http.Response(
     jsonEncode(body),

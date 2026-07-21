@@ -20,6 +20,7 @@ enum DomainRegion implements ResendWireValue {
 
   const DomainRegion(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -34,6 +35,7 @@ enum DomainTls implements ResendWireValue {
 
   const DomainTls(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -48,6 +50,7 @@ enum DomainCapabilityStatus implements ResendWireValue {
 
   const DomainCapabilityStatus(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -71,6 +74,7 @@ enum DomainRecordKind implements ResendWireValue {
 
   const DomainRecordKind(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -91,6 +95,7 @@ enum DomainDnsType implements ResendWireValue {
 
   const DomainDnsType(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -114,6 +119,7 @@ final class DomainCapabilitiesRequest implements ResendRequest {
   /// Receiving capability update.
   final DomainCapabilityStatus? receiving;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'sending': sending?.value,
@@ -167,6 +173,7 @@ final class CreateDomainRequest implements ResendRequest {
   /// Subdomain used for click and open tracking.
   final String? trackingSubdomain;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -220,6 +227,7 @@ final class UpdateDomainRequest implements ResendRequest {
   /// is configured; it can only be replaced and re-verified.
   final String? trackingSubdomain;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'open_tracking': openTracking,
@@ -268,6 +276,7 @@ final class ClaimDomainRequest implements ResendRequest {
   /// Desired tracking subdomain.
   final String? trackingSubdomain;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -446,6 +455,7 @@ final class DomainsResource {
   /// Creates a domains resource client.
   DomainsResource(this._transport);
 
+  /// Transport used to execute domain endpoint requests.
   final ResendTransport _transport;
 
   /// Creates a domain.
@@ -540,10 +550,12 @@ final class DomainsResource {
   }
 }
 
+/// Validates [value] when present while preserving null omission semantics.
 String? _optionalNonBlank(String? value, String name) {
   return value == null ? null : requireNonBlank(value, name);
 }
 
+/// Resolves [value] to a known enum while preserving forward compatibility.
 T? _knownWireValue<T extends ResendWireValue>(List<T> values, String value) {
   for (final T candidate in values) {
     if (candidate.value == value) return candidate;
@@ -551,6 +563,7 @@ T? _knownWireValue<T extends ResendWireValue>(List<T> values, String value) {
   return null;
 }
 
+/// Decodes and freezes a required array of domain response models.
 List<T> _models<T>(
   ResendModel reader,
   String key,
@@ -566,6 +579,7 @@ List<T> _models<T>(
   );
 }
 
+/// Decodes an optional domain-model array while preserving absence.
 List<T>? _optionalModels<T>(
   ResendModel reader,
   String key,

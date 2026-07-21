@@ -2,7 +2,9 @@ import 'package:dart_resend/src/models/base.dart';
 import 'package:dart_resend/src/models/request.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: ResendModel.
   group('ResendModel', () {
     final _TestModel model = _TestModel(<String, Object?>{
       'string': 'value',
@@ -12,6 +14,7 @@ void main() {
       'date': '2026-07-20T12:00:00Z',
     });
 
+    // Verifies: reads typed, object, list, and timestamp fields.
     test('reads typed, object, list, and timestamp fields', () {
       expect(model.field<String>('string'), 'value');
       expect(model.optionalField<String>('string'), 'value');
@@ -32,6 +35,7 @@ void main() {
       expect(() => model.json['new'] = true, throwsUnsupportedError);
     });
 
+    // Verifies: reports malformed fields with context.
     test('reports malformed fields with context', () {
       expect(() => model.field<int>('string'), throwsFormatException);
       expect(() => model.optionalField<int>('string'), throwsFormatException);
@@ -66,6 +70,7 @@ void main() {
     });
   });
 
+  // Verifies: standard ID and deletion responses expose optional metadata.
   test('standard ID and deletion responses expose optional metadata', () {
     final ResendId id = ResendId.fromJson(<String, Object?>{
       'id': 'id_1',
@@ -89,6 +94,7 @@ void main() {
     expect(empty.deleted, isNull);
   });
 
+  // Verifies: page and collection decode typed immutable data.
   test('page and collection decode typed immutable data', () {
     final ResendPage<ResendId> page = ResendPage<ResendId>.fromJson(
       <String, Object?>{
@@ -130,7 +136,9 @@ void main() {
     );
   });
 
+  // Covers: request helpers.
   group('request helpers', () {
+    // Verifies: compactJson omits null and keeps false.
     test('compactJson omits null and keeps false', () {
       expect(
         compactJson(<String, Object?>{'null': null, 'false': false}),
@@ -138,6 +146,7 @@ void main() {
       );
     });
 
+    // Verifies: validates non-blank strings and non-empty immutable lists.
     test('validates non-blank strings and non-empty immutable lists', () {
       expect(requireNonBlank(' value ', 'name'), ' value ');
       expect(() => requireNonBlank(' ', 'name'), throwsArgumentError);
@@ -153,13 +162,18 @@ void main() {
   });
 }
 
+/// Concrete model used to exercise [ResendModel]'s protected readers.
 final class _TestModel extends ResendModel {
+  /// Creates a test model over [json].
   _TestModel(super.json);
 }
 
+/// Minimal wire-value implementation used by collection validation tests.
 final class _WireValue implements ResendWireValue {
+  /// Creates the fixed test wire value.
   const _WireValue();
 
+  /// Fixed serialized value asserted by the request-helper tests.
   @override
   String get value => 'wire';
 }

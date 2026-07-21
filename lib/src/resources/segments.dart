@@ -14,6 +14,7 @@ final class CreateSegmentRequest implements ResendRequest {
   /// The segment's human-readable name.
   final String name;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => <String, Object?>{'name': name};
 }
@@ -41,6 +42,7 @@ final class SegmentsResource {
   /// Creates a segments resource client.
   SegmentsResource(this._transport);
 
+  /// Transport used to execute segment endpoint requests.
   final ResendTransport _transport;
 
   /// Creates a segment.

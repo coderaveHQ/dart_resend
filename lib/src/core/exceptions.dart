@@ -14,6 +14,7 @@ sealed class ResendException implements Exception {
   /// Stack trace associated with [cause], when available.
   final StackTrace? stackTrace;
 
+  /// Returns a diagnostic representation of this value.
   @override
   String toString() => '$runtimeType: $message';
 }
@@ -58,6 +59,7 @@ final class ResendApiException extends ResendException {
         header('x-resend-id');
   }
 
+  /// Returns a diagnostic representation of this value.
   @override
   String toString() {
     final String suffix = name == null ? '' : ' ($name)';
@@ -116,6 +118,7 @@ final class ResendDecodeException extends ResendException {
   final String? responseBody;
 }
 
+/// Freezes [headers] with lowercase keys for case-insensitive lookup.
 Map<String, String> _normalizedHeaders(Map<String, String> headers) {
   return Map<String, String>.unmodifiable(<String, String>{
     for (final MapEntry<String, String> entry in headers.entries)

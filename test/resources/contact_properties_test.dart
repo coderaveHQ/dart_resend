@@ -7,13 +7,17 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: contact-property request models.
   group('contact-property request models', () {
+    // Verifies: serialize documented property types.
     test('serialize documented property types', () {
       expect(ContactPropertyType.string.value, 'string');
       expect(ContactPropertyType.number.value, 'number');
     });
 
+    // Verifies: create validates the key and type-specific fallback.
     test('create validates the key and type-specific fallback', () {
       final CreateContactPropertyRequest text = CreateContactPropertyRequest(
         key: 'company_name_2',
@@ -83,6 +87,7 @@ void main() {
       );
     });
 
+    // Verifies: update includes explicit null and validates scalar fallbacks.
     test('update includes explicit null and validates scalar fallbacks', () {
       final UpdateContactPropertyRequest clear = UpdateContactPropertyRequest(
         fallbackValue: null,
@@ -105,6 +110,7 @@ void main() {
     });
   });
 
+  // Verifies: ContactProperty exposes typed and forward-compatible fields.
   test('ContactProperty exposes typed and forward-compatible fields', () {
     final ContactProperty property = ContactProperty.fromJson(<String, Object?>{
       'id': 'prop_1',
@@ -138,6 +144,7 @@ void main() {
     expect(minimal.object, isNull);
   });
 
+  // Verifies: ContactPropertiesResource sends every documented operation.
   test('ContactPropertiesResource sends every documented operation', () async {
     final List<http.Request> requests = <http.Request>[];
     final MockClient client = MockClient((http.Request request) async {
@@ -232,6 +239,7 @@ void main() {
   });
 }
 
+/// Builds a contact-property response fixture for [id].
 Map<String, Object?> _propertyJson(String id) => <String, Object?>{
   'id': id,
   'key': 'company',
@@ -241,6 +249,7 @@ Map<String, Object?> _propertyJson(String id) => <String, Object?>{
   'object': 'contact_property',
 };
 
+/// Encodes [body] as a contact-property endpoint response.
 http.Response _jsonResponse(Object body, [int statusCode = 200]) {
   return http.Response(
     jsonEncode(body),

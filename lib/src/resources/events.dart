@@ -21,6 +21,7 @@ enum EventSchemaType implements ResendWireValue {
 
   const EventSchemaType(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -40,6 +41,7 @@ final class CreateEventRequest implements ResendRequest {
   /// Optional immutable payload schema.
   final Map<String, EventSchemaType>? schema;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'name': name,
@@ -58,6 +60,7 @@ final class UpdateEventRequest implements ResendRequest {
   /// Replacement schema, or `null` to clear it.
   final Map<String, EventSchemaType>? schema;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => immutableJsonMap(<String, Object?>{
     'schema': schema == null ? null : _schemaJson(schema!),
@@ -117,6 +120,7 @@ final class SendEventRequest implements ResendRequest {
   /// Deeply immutable event payload.
   final JsonObject? payload;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'event': event,
@@ -181,6 +185,7 @@ final class EventsResource {
   /// Creates an events resource client.
   EventsResource(this._transport);
 
+  /// Transport used to execute event endpoint requests.
   final ResendTransport _transport;
 
   /// Creates a custom event definition.
@@ -242,6 +247,7 @@ final class EventsResource {
   }
 }
 
+/// Validates schema keys and returns an immutable schema map.
 Map<String, EventSchemaType> _validatedSchema(
   Map<String, EventSchemaType> schema,
 ) {
@@ -251,6 +257,7 @@ Map<String, EventSchemaType> _validatedSchema(
   return Map<String, EventSchemaType>.unmodifiable(schema);
 }
 
+/// Encodes a validated event schema using each type's wire value.
 JsonObject _schemaJson(Map<String, EventSchemaType> schema) {
   return immutableJsonMap(<String, Object?>{
     for (final MapEntry<String, EventSchemaType> entry in schema.entries)
@@ -258,6 +265,7 @@ JsonObject _schemaJson(Map<String, EventSchemaType> schema) {
   });
 }
 
+/// Validates [value] when present while preserving null omission semantics.
 String? _optionalNonBlank(String? value, String name) {
   return value == null ? null : requireNonBlank(value, name);
 }

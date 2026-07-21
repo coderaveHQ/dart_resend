@@ -59,6 +59,7 @@ enum WebhookEventType implements ResendWireValue {
 
   const WebhookEventType(this.value);
 
+  /// Wire value used when encoding this event type.
   @override
   final String value;
 }
@@ -73,6 +74,7 @@ enum WebhookStatus implements ResendWireValue {
 
   const WebhookStatus(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -92,6 +94,7 @@ final class CreateWebhookRequest implements ResendRequest {
   /// Event types delivered to the endpoint.
   final List<WebhookEventType> events;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => <String, Object?>{
     'endpoint': endpoint.toString(),
@@ -124,6 +127,7 @@ final class UpdateWebhookRequest implements ResendRequest {
   /// Updated delivery status.
   final WebhookStatus? status;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'endpoint': endpoint?.toString(),
@@ -164,6 +168,7 @@ final class WebhooksResource {
   /// Creates a webhooks resource client.
   WebhooksResource(this._transport);
 
+  /// Transport used to execute webhook endpoint requests.
   final ResendTransport _transport;
 
   /// Creates a webhook.
@@ -216,6 +221,7 @@ final class WebhooksResource {
   }
 }
 
+/// Accepts only absolute HTTP(S) webhook destinations.
 Uri _validateEndpoint(Uri endpoint) {
   if (!endpoint.hasAuthority || endpoint.scheme != 'https') {
     throw ArgumentError.value(

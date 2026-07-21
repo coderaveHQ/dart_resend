@@ -7,7 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: CreateSegmentRequest validates and serializes its name.
   test('CreateSegmentRequest validates and serializes its name', () {
     final CreateSegmentRequest request = CreateSegmentRequest(name: 'VIP');
     expect(request.name, 'VIP');
@@ -15,6 +17,7 @@ void main() {
     expect(() => CreateSegmentRequest(name: '  '), throwsArgumentError);
   });
 
+  // Verifies: Segment exposes typed fields and immutable raw JSON.
   test('Segment exposes typed fields and immutable raw JSON', () {
     final Segment segment = Segment.fromJson(<String, Object?>{
       'id': 'segment_1',
@@ -38,6 +41,7 @@ void main() {
     expect(minimal.object, isNull);
   });
 
+  // Verifies: SegmentsResource sends every documented operation.
   test('SegmentsResource sends every documented operation', () async {
     final List<http.Request> requests = <http.Request>[];
     final MockClient client = MockClient((http.Request request) async {
@@ -129,6 +133,7 @@ void main() {
   });
 }
 
+/// Builds a segment response fixture for [id].
 Map<String, Object?> _segmentJson(String id) => <String, Object?>{
   'id': id,
   'name': 'VIP',
@@ -136,6 +141,7 @@ Map<String, Object?> _segmentJson(String id) => <String, Object?>{
   'object': 'segment',
 };
 
+/// Builds the contact fixture returned by segment membership endpoints.
 Map<String, Object?> _contactJson() => <String, Object?>{
   'id': 'contact_1',
   'email': 'person@example.com',
@@ -147,6 +153,7 @@ Map<String, Object?> _contactJson() => <String, Object?>{
   'object': 'contact',
 };
 
+/// Encodes [body] as the JSON response returned by a segment endpoint.
 http.Response _jsonResponse(Object body, [int statusCode = 200]) {
   return http.Response(
     jsonEncode(body),

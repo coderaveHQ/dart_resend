@@ -5,7 +5,9 @@ import 'package:test/test.dart';
 
 import '../support/mock_transport.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: broadcast create and update requests serialize every field.
   test('broadcast create and update requests serialize every field', () {
     final CreateBroadcastRequest create = CreateBroadcastRequest(
       segmentId: 'segment_1',
@@ -50,6 +52,7 @@ void main() {
     });
   });
 
+  // Verifies: broadcast requests reject conflicting and incomplete parameters.
   test('broadcast requests reject conflicting and incomplete parameters', () {
     expect(
       () => CreateBroadcastRequest(
@@ -85,6 +88,7 @@ void main() {
     );
   });
 
+  // Verifies: broadcast models expose every response field.
   test('broadcast models expose every response field', () {
     final Broadcast broadcast = Broadcast.fromJson(_broadcastJson);
     expect(broadcast.id, 'broadcast_1');
@@ -120,6 +124,7 @@ void main() {
     expect(summary.topicId, isNull);
   });
 
+  // Verifies: broadcasts resource covers every endpoint.
   test('broadcasts resource covers every endpoint', () async {
     var call = 0;
     final BroadcastsResource resource = BroadcastsResource(

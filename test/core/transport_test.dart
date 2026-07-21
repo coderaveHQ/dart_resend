@@ -9,8 +9,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: ResendTransport construction.
   group('ResendTransport construction', () {
+    // Verifies: uses production defaults and can close its owned client.
     test('uses production defaults and can close its owned client', () {
       final ResendTransport transport = ResendTransport(apiKey: 're_test');
       expect(transport.baseUri, Uri.parse('https://api.resend.com'));
@@ -20,6 +23,7 @@ void main() {
       transport.close();
     });
 
+    // Verifies: validates configuration.
     test('validates configuration', () {
       expect(() => ResendTransport(apiKey: '  '), throwsArgumentError);
       expect(
@@ -50,6 +54,7 @@ void main() {
       );
     });
 
+    // Verifies: respects injected-client ownership.
     test('respects injected-client ownership', () {
       final _TrackingClient callerOwned = _TrackingClient();
       ResendTransport(apiKey: 'key', client: callerOwned).close();
@@ -67,7 +72,9 @@ void main() {
     });
   });
 
+  // Covers: requests.
   group('requests', () {
+    // Verifies: encodes URI, JSON, and protected and custom headers.
     test('encodes URI, JSON, and protected and custom headers', () async {
       late http.Request captured;
       final MockClient client = MockClient((http.Request request) async {
@@ -123,6 +130,7 @@ void main() {
       expect(response.requestId, 'request-id');
     });
 
+    // Verifies: supports unauthenticated form requests.
     test('supports unauthenticated form requests', () async {
       late http.Request captured;
       final ResendTransport transport = ResendTransport(
@@ -155,6 +163,7 @@ void main() {
       expect(response.data, 'token');
     });
 
+    // Verifies: convenience methods forward all HTTP methods.
     test('convenience methods forward all HTTP methods', () async {
       final List<String> methods = <String>[];
       final ResendTransport transport = ResendTransport(
@@ -200,6 +209,7 @@ void main() {
       expect(methods, <String>['GET', 'PATCH', 'DELETE']);
     });
 
+    // Verifies: accepts empty successful response bodies.
     test('accepts empty successful response bodies', () async {
       final ResendTransport transport = ResendTransport(
         apiKey: 'key',
@@ -215,6 +225,7 @@ void main() {
       expect(response.statusCode, 204);
     });
 
+    // Verifies: validates request arguments and closed state.
     test('validates request arguments and closed state', () async {
       final ResendTransport transport = ResendTransport(
         apiKey: 'key',
@@ -278,7 +289,9 @@ void main() {
     });
   });
 
+  // Covers: multipart requests.
   group('multipart requests', () {
+    // Verifies: uploads bytes, fields, query, and headers.
     test('uploads bytes, fields, query, and headers', () async {
       late http.Request captured;
       final ResendTransport transport = ResendTransport(
@@ -318,6 +331,7 @@ void main() {
       expect(response.data, 'import-id');
     });
 
+    // Verifies: supports unauthenticated multipart calls.
     test('supports unauthenticated multipart calls', () async {
       late http.Request captured;
       final ResendTransport transport = ResendTransport(
@@ -336,6 +350,7 @@ void main() {
       expect(captured.headers, isNot(contains('authorization')));
     });
 
+    // Verifies: validates multipart arguments and closed state.
     test('validates multipart arguments and closed state', () async {
       final ResendTransport transport = ResendTransport(
         apiKey: 'key',
@@ -411,7 +426,9 @@ void main() {
     });
   });
 
+  // Covers: failures.
   group('failures', () {
+    // Verifies: maps Resend, nested, and OAuth API error shapes.
     test('maps Resend, nested, and OAuth API error shapes', () async {
       Future<ResendApiException> invoke(String body) async {
         final ResendTransport transport = ResendTransport(
@@ -473,6 +490,7 @@ void main() {
       expect(stringError.message, 'plain_error');
     });
 
+    // Verifies: retains non-object and malformed API error bodies.
     test('retains non-object and malformed API error bodies', () async {
       Future<ResendApiException> invoke(
         String body, {
@@ -511,6 +529,7 @@ void main() {
       expect(empty.message, 'Request failed with status code 500.');
     });
 
+    // Verifies: wraps invalid JSON and model decoders.
     test('wraps invalid JSON and model decoders', () async {
       Future<Object> invoke(String body, void Function(JsonMap) decode) async {
         final ResendTransport transport = ResendTransport(
@@ -553,6 +572,7 @@ void main() {
       expect(model.statusCode, 200);
     });
 
+    // Verifies: maps timeout, HTTP client, and other network failures.
     test('maps timeout, HTTP client, and other network failures', () async {
       final ResendTransport timeoutTransport = ResendTransport(
         apiKey: 'key',
@@ -625,32 +645,42 @@ void main() {
   });
 }
 
+/// HTTP client double that records whether ownership cleanup closes it.
 final class _TrackingClient extends http.BaseClient {
+  /// Number of times [close] has been invoked.
   int closeCount = 0;
 
+  /// Rejects request dispatch because ownership tests do not send requests.
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
     throw UnimplementedError();
   }
 
+  /// Records each close call without allocating network resources.
   @override
   void close() {
     closeCount++;
   }
 }
 
+/// HTTP client double that completes every request with [error].
 final class _ErrorClient extends http.BaseClient {
+  /// Creates a client that emits [error] from [send].
   _ErrorClient(this.error);
 
+  /// Error propagated by [send].
   final Object error;
 
+  /// Returns an asynchronously failed response future.
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
     return Future<http.StreamedResponse>.error(error);
   }
 }
 
+/// HTTP client double whose requests remain pending for timeout tests.
 final class _HangingClient extends http.BaseClient {
+  /// Returns a response future that never completes.
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
     return Completer<http.StreamedResponse>().future;

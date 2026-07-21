@@ -132,6 +132,7 @@ extension JsonMapReader on JsonMap {
     return value == null ? null : _parseDateTime(key, value);
   }
 
+  /// Returns a present, non-null value before a typed reader casts it.
   Object _requiredValue(String key) {
     if (!containsKey(key)) {
       throw FormatException('Missing required JSON field "$key".');
@@ -143,6 +144,7 @@ extension JsonMapReader on JsonMap {
     return value;
   }
 
+  /// Reads a required value of [T] or reports the expected wire type.
   T _requiredType<T>(String key, String expected) {
     final Object value = _requiredValue(key);
     if (value is! T) {
@@ -151,6 +153,7 @@ extension JsonMapReader on JsonMap {
     return value as T;
   }
 
+  /// Reads a nullable value of [T] or reports the expected wire type.
   T? _optionalType<T>(String key, String expected) {
     final Object? value = this[key];
     if (value == null) {
@@ -163,6 +166,7 @@ extension JsonMapReader on JsonMap {
   }
 }
 
+/// Converts [value] to an immutable string-keyed object for [key].
 JsonMap _asJsonMap(String key, Map<Object?, Object?> value) {
   final JsonMap result = <String, Object?>{};
   for (final MapEntry<Object?, Object?> entry in value.entries) {
@@ -177,6 +181,7 @@ JsonMap _asJsonMap(String key, Map<Object?, Object?> value) {
   return immutableJsonMap(result);
 }
 
+/// Validates and freezes the string array stored at [key].
 List<String> _stringList(String key, List<Object?> values) {
   final List<String> result = <String>[];
   for (var index = 0; index < values.length; index++) {
@@ -192,6 +197,7 @@ List<String> _stringList(String key, List<Object?> values) {
   return List<String>.unmodifiable(result);
 }
 
+/// Parses the ISO-8601 [value] stored at [key].
 DateTime _parseDateTime(String key, String value) {
   final DateTime? result = DateTime.tryParse(value);
   if (result == null) {
@@ -202,11 +208,13 @@ DateTime _parseDateTime(String key, String value) {
   return result;
 }
 
+/// Builds a field-specific wire-type error for a JSON reader.
 FormatException _wrongType(String key, String expected, Object? actual) {
   return FormatException(
     'JSON field "$key" must be $expected, but was ${_typeName(actual)}.',
   );
 }
 
+/// Returns a stable diagnostic type name, including an explicit null label.
 String _typeName(Object? value) =>
     value == null ? 'null' : value.runtimeType.toString();

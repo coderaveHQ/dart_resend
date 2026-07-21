@@ -5,7 +5,9 @@ import 'package:test/test.dart';
 
 import '../support/mock_transport.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: suppression models and batch selectors expose all data.
   test('suppression models and batch selectors expose all data', () {
     expect(
       SuppressionOrigin.values.map((SuppressionOrigin value) => value.value),
@@ -51,6 +53,7 @@ void main() {
     });
   });
 
+  // Verifies: batch selectors validate count and blank values.
   test('batch selectors validate count and blank values', () {
     expect(
       () => RemoveSuppressionsRequest.byEmails(<String>[]),
@@ -66,6 +69,7 @@ void main() {
     );
   });
 
+  // Verifies: suppression resource supports single and batch operations.
   test('suppression resource supports single and batch operations', () async {
     var call = 0;
     final SuppressionsResource resource = SuppressionsResource(

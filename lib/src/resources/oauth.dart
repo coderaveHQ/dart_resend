@@ -19,6 +19,7 @@ enum OAuthScope implements ResendWireValue {
 
   const OAuthScope(this.value);
 
+  /// Wire value used when encoding this enum member.
   @override
   final String value;
 }
@@ -57,6 +58,7 @@ final class OAuthPkcePair {
     );
   }
 
+  /// Creates a validated verifier and its derived S256 challenge.
   OAuthPkcePair._(this.verifier, this.challenge);
 
   /// The secret value retained by the OAuth client.
@@ -135,6 +137,7 @@ final class RegisterOAuthClientRequest implements ResendRequest {
   /// Optional logo displayed on the consent screen.
   final Uri? logoUri;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'client_name': clientName,
@@ -281,7 +284,10 @@ final class OAuthResource {
   /// Creates an OAuth resource client.
   OAuthResource(this._transport, {required Uri baseUrl}) : _baseUrl = baseUrl;
 
+  /// Transport used for OAuth registration, token, and grant requests.
   final ResendTransport _transport;
+
+  /// Browser-facing OAuth origin used to construct authorization URLs.
   final Uri _baseUrl;
 
   /// Dynamically registers an unauthenticated public OAuth client.
@@ -395,6 +401,7 @@ final class OAuthResource {
   }
 }
 
+/// Encodes unique OAuth scopes as one space-delimited parameter.
 String? _scopeValue(List<OAuthScope>? scopes) {
   if (scopes == null) return null;
   if (scopes.isEmpty) {
@@ -403,6 +410,7 @@ String? _scopeValue(List<OAuthScope>? scopes) {
   return scopes.map((OAuthScope scope) => scope.value).join(' ');
 }
 
+/// Enforces an absolute redirect URI accepted by OAuth registration.
 void _validateRedirectUri(Uri uri) {
   final String value = uri.toString();
   if (!uri.hasScheme || value.length > 2048 || uri.hasFragment) {

@@ -3,8 +3,11 @@ import 'package:dart_resend/src/core/json.dart';
 import 'package:dart_resend/src/core/response.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: ResendResponse.
   group('ResendResponse', () {
+    // Verifies: stores data, status, and immutable case-insensitive headers.
     test('stores data, status, and immutable case-insensitive headers', () {
       final Map<String, String> source = <String, String>{'X-Test': 'value'};
       final ResendResponse<String> response = ResendResponse<String>(
@@ -25,6 +28,7 @@ void main() {
       );
     });
 
+    // Verifies: reads each supported request-id header.
     test('reads each supported request-id header', () {
       for (final String name in <String>[
         'x-request-id',
@@ -46,6 +50,7 @@ void main() {
       );
     });
 
+    // Verifies: parses standard and prefixed rate-limit headers.
     test('parses standard and prefixed rate-limit headers', () {
       final ResendRateLimit standard = ResendResponse<void>(
         data: null,
@@ -74,6 +79,7 @@ void main() {
       expect(prefixed.resetAfter, const Duration(seconds: 2));
     });
 
+    // Verifies: ignores absent and malformed rate-limit headers.
     test('ignores absent and malformed rate-limit headers', () {
       expect(
         ResendResponse<void>(data: null, statusCode: 200).rateLimit,
@@ -115,7 +121,9 @@ void main() {
     });
   });
 
+  // Covers: Resend exceptions.
   group('Resend exceptions', () {
+    // Verifies: API exception preserves immutable diagnostics.
     test('API exception preserves immutable diagnostics', () {
       final JsonMap details = <String, Object?>{
         'message': 'Denied',
@@ -152,6 +160,8 @@ void main() {
       expect(() => exception.headers['new'] = 'value', throwsUnsupportedError);
     });
 
+    // Verifies: API exception supports request-id fallbacks and absent
+    // details.
     test('API exception supports request-id fallbacks and absent details', () {
       for (final String name in <String>[
         'request-id',
@@ -175,6 +185,7 @@ void main() {
       expect(exception.toString(), 'ResendApiException [400]: Bad request');
     });
 
+    // Verifies: network, timeout, and decode failures retain their causes.
     test('network, timeout, and decode failures retain their causes', () {
       final StateError cause = StateError('offline');
       final StackTrace stackTrace = StackTrace.current;

@@ -64,6 +64,7 @@ final class CreateBroadcastRequest implements ResendRequest {
   /// Optional scheduled send time or relative expression.
   final String? scheduledAt;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() => compactJson(<String, Object?>{
     'segment_id': segmentId,
@@ -144,6 +145,7 @@ final class UpdateBroadcastRequest implements ResendRequest {
   /// Whether to remove the currently assigned topic.
   final bool clearTopic;
 
+  /// Encodes this value as a Resend API JSON object.
   @override
   JsonObject toJson() {
     final JsonObject json = compactJson(<String, Object?>{
@@ -219,6 +221,7 @@ final class BroadcastsResource {
   /// Creates a broadcasts resource client.
   BroadcastsResource(this._transport);
 
+  /// Transport used to execute broadcast endpoint requests.
   final ResendTransport _transport;
 
   /// Creates, sends, or schedules a broadcast.

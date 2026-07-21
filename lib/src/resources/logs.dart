@@ -39,6 +39,7 @@ final class LogsResource {
   /// Creates a logs resource client.
   LogsResource(this._transport);
 
+  /// Transport used to execute API-log endpoint requests.
   final ResendTransport _transport;
 
   /// Lists API request logs.

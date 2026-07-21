@@ -9,8 +9,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: email requests.
   group('email requests', () {
+    // Verifies: wire enums expose documented values.
     test('wire enums expose documented values', () {
       expect(
         BatchValidationMode.values
@@ -26,6 +29,7 @@ void main() {
       );
     });
 
+    // Verifies: tags validate and serialize.
     test('tags validate and serialize', () {
       final EmailTag tag = EmailTag(name: 'campaign_id', value: 'welcome-1');
       expect(tag.name, 'campaign_id');
@@ -50,6 +54,7 @@ void main() {
       expect(() => EmailTag(name: 'ok', value: 'x' * 257), throwsArgumentError);
     });
 
+    // Verifies: templates validate variables and serialize.
     test('templates validate variables and serialize', () {
       final EmailTemplate template = EmailTemplate(
         id: 'welcome',
@@ -109,6 +114,7 @@ void main() {
       );
     });
 
+    // Verifies: attachments support bytes, Base64, and remote content.
     test('attachments support bytes, Base64, and remote content', () {
       final EmailAttachment bytes = EmailAttachment.bytes(
         <int>[1, 2, 3],
@@ -159,6 +165,7 @@ void main() {
       );
     });
 
+    // Verifies: raw send requests serialize all supported options.
     test('raw send requests serialize all supported options', () {
       final SendEmailRequest request = SendEmailRequest.raw(
         from: 'Acme <sender@example.com>',
@@ -199,6 +206,7 @@ void main() {
       });
     });
 
+    // Verifies: template send requests use conditional template defaults.
     test('template send requests use conditional template defaults', () {
       final SendEmailRequest minimal = SendEmailRequest.template(
         template: EmailTemplate(id: 'welcome'),
@@ -226,6 +234,7 @@ void main() {
       expect(overrides.toJson()['text'], isNull);
     });
 
+    // Verifies: batch request variants exclude unsupported fields.
     test('batch request variants exclude unsupported fields', () {
       final BatchEmailRequest raw = BatchEmailRequest.raw(
         from: 'sender@example.com',
@@ -261,6 +270,7 @@ void main() {
       expect(template.toJson()['html'], isNull);
     });
 
+    // Verifies: send request validation rejects invalid combinations.
     test('send request validation rejects invalid combinations', () {
       expect(
         () => SendEmailRequest.raw(
@@ -403,6 +413,7 @@ void main() {
       );
     });
 
+    // Verifies: combined encoded attachment size is limited to 40 MB.
     test('combined encoded attachment size is limited to 40 MB', () {
       final Uint8List bytes = Uint8List(15 * 1024 * 1024 + 1);
       final EmailAttachment first = EmailAttachment.bytes(bytes);
@@ -419,6 +430,7 @@ void main() {
       );
     });
 
+    // Verifies: scheduled update validates and serializes.
     test('scheduled update validates and serializes', () {
       final UpdateEmailRequest request = UpdateEmailRequest(
         scheduledAt: 'tomorrow at 9am',
@@ -431,7 +443,9 @@ void main() {
     });
   });
 
+  // Covers: email models.
   group('email models', () {
+    // Verifies: sent email exposes all current and future fields.
     test('sent email exposes all current and future fields', () {
       final SentEmail email = SentEmail.fromJson(_sentEmailJson());
       expect(email.object, 'email');
@@ -474,6 +488,7 @@ void main() {
       expect(minimal.bounce, isNull);
     });
 
+    // Verifies: batch results expose successes and permissive errors.
     test('batch results expose successes and permissive errors', () {
       final BatchEmailResult result = BatchEmailResult.fromJson(
         <String, Object?>{
@@ -502,6 +517,7 @@ void main() {
       );
     });
 
+    // Verifies: retrieved attachment exposes signed URL metadata.
     test('retrieved attachment exposes signed URL metadata', () {
       final RetrievedEmailAttachment attachment =
           RetrievedEmailAttachment.fromJson(_retrievedAttachmentJson());
@@ -531,6 +547,7 @@ void main() {
       expect(optional.contentId, isNull);
     });
 
+    // Verifies: received email exposes raw and embedded attachment metadata.
     test('received email exposes raw and embedded attachment metadata', () {
       final ReceivedEmail email = ReceivedEmail.fromJson(_receivedEmailJson());
       expect(email.object, 'email');
@@ -581,7 +598,9 @@ void main() {
     });
   });
 
+  // Covers: EmailsResource.
   group('EmailsResource', () {
+    // Verifies: calls every sending, receiving, and attachment endpoint.
     test('calls every sending, receiving, and attachment endpoint', () async {
       final List<String> calls = <String>[];
       final EmailsResource emails = _emailsResource((
@@ -760,6 +779,7 @@ void main() {
       expect(calls, hasLength(13));
     });
 
+    // Verifies: validates batch size and idempotency key length locally.
     test('validates batch size and idempotency key length locally', () {
       final EmailsResource emails = _emailsResource(
         (http.Request request) async => _jsonResponse(<String, Object?>{}),
@@ -800,6 +820,7 @@ void main() {
   });
 }
 
+/// Creates an email resource whose transport delegates to [handler].
 EmailsResource _emailsResource(
   Future<http.Response> Function(http.Request request) handler,
 ) {
@@ -812,6 +833,7 @@ EmailsResource _emailsResource(
   );
 }
 
+/// Encodes [json] as a successful email endpoint response.
 http.Response _jsonResponse(JsonObject json) {
   return http.Response(
     jsonEncode(json),
@@ -820,6 +842,7 @@ http.Response _jsonResponse(JsonObject json) {
   );
 }
 
+/// Builds a paginated email-attachment response fixture.
 http.Response _attachmentPage() {
   return _jsonResponse(<String, Object?>{
     'object': 'list',
@@ -828,6 +851,7 @@ http.Response _attachmentPage() {
   });
 }
 
+/// Builds a sent-email fixture with optionally omitted detail fields.
 JsonObject _sentEmailJson({bool includeOptional = true}) {
   return <String, Object?>{
     if (includeOptional) 'object': 'email',
@@ -860,6 +884,7 @@ JsonObject _sentEmailJson({bool includeOptional = true}) {
   };
 }
 
+/// Builds a retrieved email-attachment response fixture.
 JsonObject _retrievedAttachmentJson() {
   return <String, Object?>{
     'object': 'attachment',
@@ -874,6 +899,7 @@ JsonObject _retrievedAttachmentJson() {
   };
 }
 
+/// Builds a received-email fixture with optionally omitted detail fields.
 JsonObject _receivedEmailJson({bool includeOptional = true}) {
   return <String, Object?>{
     if (includeOptional) 'object': 'email',

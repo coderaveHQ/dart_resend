@@ -5,7 +5,9 @@ import 'package:test/test.dart';
 
 import '../support/mock_transport.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Verifies: log model exposes summary and detail fields.
   test('log model exposes summary and detail fields', () {
     final ResendApiLog log = ResendApiLog.fromJson(_detailLog);
     expect(log.id, 'log_1');
@@ -27,6 +29,7 @@ void main() {
     );
   });
 
+  // Verifies: logs resource lists and retrieves logs.
   test('logs resource lists and retrieves logs', () async {
     var call = 0;
     final LogsResource resource = LogsResource(

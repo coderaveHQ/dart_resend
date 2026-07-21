@@ -74,6 +74,7 @@ abstract base class ResendModel {
     return value == null ? null : DateTime.parse(value);
   }
 
+  /// Returns a diagnostic representation of this value.
   @override
   String toString() => '$runtimeType($json)';
 }
@@ -107,6 +108,7 @@ final class ResendDeletion extends ResendModel {
 
 /// A cursor-paginated collection returned by Resend.
 final class ResendPage<T> extends ResendModel {
+  /// Creates a page after [data] has been decoded and frozen.
   ResendPage._(super.json, this.data);
 
   /// Decodes a cursor-paginated response.
@@ -134,6 +136,7 @@ final class ResendPage<T> extends ResendModel {
 
 /// A non-paginated `data` collection returned by a batch operation.
 final class ResendCollection<T> extends ResendModel {
+  /// Creates a collection after [data] has been decoded and frozen.
   ResendCollection._(super.json, this.data);
 
   /// Decodes a collection response.
@@ -153,10 +156,13 @@ final class ResendCollection<T> extends ResendModel {
   final List<T> data;
 }
 
+/// Adapts raw response JSON to the typed readers on [ResendModel].
 final class _RawModel extends ResendModel {
+  /// Creates a reader over immutable response [json].
   _RawModel(super.json);
 }
 
+/// Validates and freezes [value] as the JSON object stored at [key].
 JsonObject _asObject(Object? value, String key) {
   if (value is Map<String, Object?>) return immutableJsonMap(value);
   throw FormatException('Expected "$key" to be a JSON object.');

@@ -61,11 +61,13 @@ final class ResendResponse<T> {
     );
   }
 
+  /// Parses an integer header using standard and legacy `x-` names.
   int? _integerHeader(String name) {
     final String? value = header(name) ?? header('x-$name');
     return value == null ? null : int.tryParse(value);
   }
 
+  /// Parses a non-negative fractional-seconds header as a [Duration].
   Duration? _durationHeader(String name) {
     final String? value = header(name) ?? header('x-$name');
     final double? seconds = value == null ? null : double.tryParse(value);
@@ -78,6 +80,7 @@ final class ResendResponse<T> {
   }
 }
 
+/// Freezes [headers] with lowercase keys for case-insensitive lookup.
 Map<String, String> _normalizedHeaders(Map<String, String> headers) {
   return Map<String, String>.unmodifiable(<String, String>{
     for (final MapEntry<String, String> entry in headers.entries)

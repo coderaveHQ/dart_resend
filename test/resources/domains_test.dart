@@ -8,8 +8,11 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
+/// Registers this file's test cases with the package:test runner.
 void main() {
+  // Covers: domain requests.
   group('domain requests', () {
+    // Verifies: wire enums expose every documented value.
     test('wire enums expose every documented value', () {
       expect(
         DomainRegion.values.map((DomainRegion value) => value.value).toList(),
@@ -37,6 +40,8 @@ void main() {
       );
     });
 
+    // Verifies: capabilities support partial changes and prevent disabling
+    // both.
     test('capabilities support partial changes and prevent disabling both', () {
       final DomainCapabilitiesRequest partial = DomainCapabilitiesRequest(
         sending: DomainCapabilityStatus.enabled,
@@ -63,6 +68,7 @@ void main() {
       );
     });
 
+    // Verifies: create domain serializes all current options.
     test('create domain serializes all current options', () {
       final CreateDomainRequest request = CreateDomainRequest(
         name: 'mail.example.com',
@@ -104,6 +110,7 @@ void main() {
       );
     });
 
+    // Verifies: create domain validates all strings.
     test('create domain validates all strings', () {
       expect(() => CreateDomainRequest(name: ' '), throwsArgumentError);
       expect(
@@ -116,6 +123,7 @@ void main() {
       );
     });
 
+    // Verifies: update domain requires and serializes at least one change.
     test('update domain requires and serializes at least one change', () {
       final UpdateDomainRequest request = UpdateDomainRequest(
         openTracking: false,
@@ -145,6 +153,7 @@ void main() {
       );
     });
 
+    // Verifies: claim domain serializes transfer configuration.
     test('claim domain serializes transfer configuration', () {
       final ClaimDomainRequest request = ClaimDomainRequest(
         name: 'claimed.example.com',
@@ -184,7 +193,9 @@ void main() {
     });
   });
 
+  // Covers: domain models.
   group('domain models', () {
+    // Verifies: domain exposes capabilities and every DNS record field.
     test('domain exposes capabilities and every DNS record field', () {
       final Domain domain = Domain.fromJson(_domainJson());
       expect(domain.object, 'domain');
@@ -223,6 +234,7 @@ void main() {
       expect(domain.json['new_domain_field'], 'preserved');
     });
 
+    // Verifies: list domain may omit retrieve-only fields.
     test('list domain may omit retrieve-only fields', () {
       final Domain domain = Domain.fromJson(
         _domainJson(includeOptional: false),
@@ -236,6 +248,7 @@ void main() {
       expect(domain.records, isNull);
     });
 
+    // Verifies: domain claims expose verification and blocking state.
     test('domain claims expose verification and blocking state', () {
       final DomainClaim claim = DomainClaim.fromJson(_claimJson());
       expect(claim.object, 'domain_claim');
@@ -268,6 +281,7 @@ void main() {
       expect(pending.failureReason, isNull);
     });
 
+    // Verifies: invalid record arrays fail with context.
     test('invalid record arrays fail with context', () {
       final Domain domain = Domain.fromJson(<String, Object?>{
         ..._domainJson(includeOptional: false),
@@ -277,7 +291,9 @@ void main() {
     });
   });
 
+  // Covers: DomainsResource.
   group('DomainsResource', () {
+    // Verifies: calls CRUD, verification, and claim endpoints.
     test('calls CRUD, verification, and claim endpoints', () async {
       final List<String> calls = <String>[];
       final DomainsResource domains = _domainsResource((
@@ -381,6 +397,7 @@ void main() {
   });
 }
 
+/// Creates a domain resource whose transport delegates to [handler].
 DomainsResource _domainsResource(
   Future<http.Response> Function(http.Request request) handler,
 ) {
@@ -393,6 +410,7 @@ DomainsResource _domainsResource(
   );
 }
 
+/// Encodes [json] as a successful domain endpoint response.
 http.Response _jsonResponse(JsonObject json) {
   return http.Response(
     jsonEncode(json),
@@ -401,6 +419,7 @@ http.Response _jsonResponse(JsonObject json) {
   );
 }
 
+/// Builds a domain fixture with optionally omitted retrieve-only fields.
 JsonObject _domainJson({bool includeOptional = true}) {
   return <String, Object?>{
     if (includeOptional) 'object': 'domain',
@@ -445,6 +464,7 @@ JsonObject _domainJson({bool includeOptional = true}) {
   };
 }
 
+/// Builds a complete domain-claim response fixture.
 JsonObject _claimJson() {
   return <String, Object?>{
     'object': 'domain_claim',
