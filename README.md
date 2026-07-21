@@ -1,7 +1,29 @@
-# dart_resend
+<h1 align="center">dart_resend</h1>
 
-[![pub package](https://img.shields.io/pub/v/dart_resend.svg)](https://pub.dev/packages/dart_resend)
-[![License](https://img.shields.io/github/license/coderaveHQ/dart_resend)](https://github.com/coderaveHQ/dart_resend/blob/production/LICENSE)
+<p align="center">
+  <a href="https://github.com/coderaveHQ/dart_resend"><img alt="GitHub repository" src="https://img.shields.io/badge/GitHub-coderaveHQ%2Fdart__resend-181717?style=flat-square&amp;logo=github"></a>
+  <a href="https://pub.dev/packages/dart_resend"><img alt="Pub package version" src="https://img.shields.io/pub/v/dart_resend?style=flat-square&amp;logo=dart&amp;logoColor=white"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend/actions/workflows/ci.yml?query=branch%3Aproduction"><img alt="Test status" src="https://img.shields.io/github/actions/workflow/status/coderaveHQ/dart_resend/ci.yml?branch=production&amp;style=flat-square&amp;logo=githubactions&amp;logoColor=white&amp;label=tests"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend/actions/workflows/ci.yml?query=branch%3Aproduction"><img alt="100% line coverage" src="https://img.shields.io/badge/coverage-100%25-brightgreen?style=flat-square"></a>
+</p>
+
+<p align="center">
+  <a href="https://pub.dev/packages/dart_resend/score"><img alt="Pub points" src="https://img.shields.io/pub/points/dart_resend?style=flat-square&amp;logo=dart&amp;logoColor=white"></a>
+  <a href="https://pub.dev/packages/dart_resend/score"><img alt="Pub likes" src="https://img.shields.io/pub/likes/dart_resend?style=flat-square&amp;logo=dart&amp;logoColor=white"></a>
+  <a href="https://pub.dev/packages/dart_resend"><img alt="Monthly Pub downloads" src="https://img.shields.io/pub/dm/dart_resend?style=flat-square&amp;logo=dart&amp;logoColor=white"></a>
+  <a href="https://dart.dev/"><img alt="Dart SDK constraint" src="https://img.shields.io/badge/Dart-%5E3.8.0-0175C2?style=flat-square&amp;logo=dart&amp;logoColor=white"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend/blob/production/LICENSE"><img alt="License" src="https://img.shields.io/github/license/coderaveHQ/dart_resend?style=flat-square"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/coderaveHQ/dart_resend/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/coderaveHQ/dart_resend?style=flat-square&amp;logo=github"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/coderaveHQ/dart_resend?style=flat-square&amp;logo=github"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend/issues"><img alt="Open GitHub issues" src="https://img.shields.io/github/issues/coderaveHQ/dart_resend?style=flat-square&amp;logo=github"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend/pulls"><img alt="Open GitHub pull requests" src="https://img.shields.io/github/issues-pr/coderaveHQ/dart_resend?style=flat-square&amp;logo=github"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/coderaveHQ/dart_resend?style=flat-square&amp;logo=github"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend/commits/production"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/coderaveHQ/dart_resend/production?style=flat-square&amp;logo=github"></a>
+  <a href="https://github.com/coderaveHQ/dart_resend"><img alt="GitHub repository size" src="https://img.shields.io/github/repo-size/coderaveHQ/dart_resend?style=flat-square&amp;logo=github"></a>
+</p>
 
 A production-ready, community-maintained Dart SDK for the complete Resend API.
 
