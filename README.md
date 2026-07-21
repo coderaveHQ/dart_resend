@@ -12,7 +12,7 @@ and its [canonical OpenAPI specification](https://github.com/resend/resend-opena
 request metadata, predictable exceptions, local validation, dependency-injected
 HTTP transport, and first-class support for every current Resend resource.
 
-Developed with 💙 and maintained by [scial.app](https://scial.app)
+Developed with 💙 and maintained by [coderave](https://coderave.dev)
 
 ## Important notes
 
@@ -312,5 +312,3 @@ model, and the Audiences-to-Segments migration.
 
 See [CONTRIBUTING.md](https://github.com/coderaveHQ/dart_resend/blob/production/CONTRIBUTING.md) for package development, tests, coverage,
 documentation, and pull-request requirements.
-
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/scial.app)
